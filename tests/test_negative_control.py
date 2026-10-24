@@ -89,6 +89,79 @@ def test_links_to_drug_wording():
     assert links_to_drug(plain) is False
 
 
+def test_links_to_drug_predose_comparison_wording():
+    # Referring to a pre-dose baseline is a comparison, not a drug link.
+    predose = Claim(
+        claim_id="C-predose",
+        type="relationship",
+        text=(
+            "From day 12 to day 15, resting heart rate increased compared to a "
+            "pre-dose baseline range."
+        ),
+        cited_record_ids=["P-07-d12-hr_resting"],
+    )
+    after_drug = Claim(
+        claim_id="C-after-drug",
+        type="relationship",
+        text="Resting heart rate rose after the study drug started.",
+        cited_record_ids=["P-07-d12-hr_resting"],
+    )
+    # A second, genuine mention of dosing still links even with a pre-dose comparison.
+    both = Claim(
+        claim_id="C-both",
+        type="relationship",
+        text="compared with pre-dose days, HRV fell after dosing began",
+        cited_record_ids=["P-07-d12-hrv_rmssd"],
+    )
+    assert links_to_drug(predose) is False
+    assert links_to_drug(after_drug) is True
+    assert links_to_drug(both) is True
+
+
+def test_links_to_drug_ignores_negated_drug_links():
+    # The final redraft claim seen in a real run DENIES a drug link; a clause that
+    # negates the link must not count as a drug link.
+    denies_link = Claim(
+        claim_id="C-denies",
+        type="relationship",
+        text=(
+            "The pre-dose versus trial-wide comparison and trial controls do not "
+            "support a link between the observed physiological shifts and the study "
+            "drug."
+        ),
+        cited_record_ids=["P-07-d12-hrv_rmssd"],
+    )
+    no_evidence = Claim(
+        claim_id="C-no-evidence",
+        type="relationship",
+        text="There is no evidence that the study drug caused the HRV drop.",
+        cited_record_ids=["P-07-d12-hrv_rmssd"],
+    )
+    # "and ... not" does not split into separate clauses in clauses() (the comma/"and"
+    # is followed by "this is not", not directly by a negation word), so the drug
+    # clause and the "not" live in one clause and the whole thing reads as negated.
+    # This is a secondary case; it must not weaken the two required False cases above.
+    mixed = Claim(
+        claim_id="C-mixed",
+        type="relationship",
+        text=(
+            "HRV dropped after the study drug started, and this is not due to sleep."
+        ),
+        cited_record_ids=["P-07-d12-hrv_rmssd"],
+    )
+    affirmed = Claim(
+        claim_id="C-affirmed",
+        type="relationship",
+        text="Resting heart rate rose after the study drug started.",
+        cited_record_ids=["P-07-d12-hr_resting"],
+    )
+    assert links_to_drug(denies_link) is False
+    assert links_to_drug(no_evidence) is False
+    # clauses() keeps the drug clause and the negation together -> negated -> False.
+    assert links_to_drug(mixed) is False
+    assert links_to_drug(affirmed) is True
+
+
 # --- check() -----------------------------------------------------------------
 
 

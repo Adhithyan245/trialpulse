@@ -41,6 +41,24 @@ FAULTS: dict[str, str] = {
 }
 
 
+# Redraft instruction, appended to the system prompt (after any fault text) when
+# the reliability gate holds a draft and new evidence has been gathered. Filled by
+# trialpulse.gate.evidence.build_feedback.
+REDRAFT_TEMPLATE = (
+    "Your previous draft was held by the reliability gate for these reasons:\n"
+    "{held_reasons}\n"
+    "New evidence now available:\n"
+    "{new_evidence}\n"
+    "{comparison}\n"
+    "Rewrite the report. Every claim must be supported by the cited records. Do not "
+    "link any change to the study drug or to dosing, not even as an association or a "
+    "timing coincidence: the pre-dose and trial-wide comparison does not support a drug "
+    "link. Describe what changed, when, and what other explanation the new evidence "
+    "offers. "
+    "State missing data and any conflict between the wearable and the diary explicitly."
+)
+
+
 def build_user_prompt(payload: dict) -> str:
     """A short instruction line followed by the payload as compact JSON."""
     return (

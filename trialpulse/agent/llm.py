@@ -123,6 +123,8 @@ class GeminiModel:
     def _generate_one(self, client, model_name, user, config, errors, schema):
         """Try a single model: retry 429/5xx with back-off, one invalid-JSON
         retry. Raise :class:`_ModelFailed` to move on to the next model."""
+        import httpx
+
         json_retry_used = False
         attempt = 0
         while True:
@@ -132,6 +134,14 @@ class GeminiModel:
                     contents=user,
                     config=config,
                 )
+            except httpx.TransportError:
+                # Network errors (RemoteProtocolError, ConnectError, ReadTimeout, etc.)
+                # are retryable like 5xx errors.
+                if attempt < len(_BACKOFF):
+                    self._sleep(_BACKOFF[attempt])
+                    attempt += 1
+                    continue
+                raise _ModelFailed("network") from None
             except errors.APIError as exc:
                 code = getattr(exc, "code", None)
                 if code == 429 or (isinstance(code, int) and code >= 500):

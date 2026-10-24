@@ -14,7 +14,7 @@ from pulseeval.evaluation.text import coverage_claims
 from pulseeval.scenarios import AssessmentCase, NumericCase, RelationshipCase
 from pulseeval.timeline import MemberTimeline, Record
 
-from trialpulse.core.models import Claim, GateCheck, Report, Signal
+from trialpulse.core.models import WEARABLE_METRICS, Claim, GateCheck, Report, Signal
 from trialpulse.data.generator import TRIAL_START, _day_time
 from trialpulse.signals.baseline import MONITORED, trial_day
 
@@ -144,28 +144,49 @@ def relationship_case(
     cited = _cited_readings(trial, claim)
 
     metric_names = [r.name for r in cited]
-    if metric_names:
-        outcome_name = Counter(metric_names).most_common(1)[0][0]
+
+    # Outcome name (never "symptom_note"):
+    #   1) the most common cited MONITORED (baseline) metric;
+    #   2) else "fatigue" if a fatigue reading is cited;
+    #   3) else the most common cited wearable metric.
+    monitored_cited = [n for n in metric_names if n in MONITORED]
+    wearable_cited = [n for n in metric_names if n in WEARABLE_METRICS]
+    if monitored_cited:
+        outcome_name = Counter(monitored_cited).most_common(1)[0][0]
+    elif "fatigue" in metric_names:
+        outcome_name = "fatigue"
+    elif wearable_cited:
+        outcome_name = Counter(wearable_cited).most_common(1)[0][0]
     else:
         outcome_name = "fatigue"
 
-    # Observed direction comes from a drift signal on the outcome metric, if any.
+    # Observed direction.
     observed_direction = "none"
-    for s in signals:
-        if (
-            s.participant_id == report.participant_id
-            and s.type == "drift"
-            and s.metric == outcome_name
-        ):
-            direction = MONITORED.get(s.metric)
-            if direction == "up":
-                observed_direction = "positive"
-            elif direction == "down":
-                observed_direction = "negative"
-            break
+    if outcome_name == "fatigue":
+        if _fatigue_rising(trial, report.participant_id, report.as_of):
+            observed_direction = "positive"
+    else:
+        # From a drift signal on the outcome metric, if any.
+        for s in signals:
+            if (
+                s.participant_id == report.participant_id
+                and s.type == "drift"
+                and s.metric == outcome_name
+            ):
+                direction = MONITORED.get(s.metric)
+                if direction == "up":
+                    observed_direction = "positive"
+                elif direction == "down":
+                    observed_direction = "negative"
+                break
 
-    # Other metric names among the cited readings, plus the exposure, are confounders.
-    confounders = [n for n in dict.fromkeys(metric_names) if n != outcome_name]
+    # Other cited metric names plus the exposure. A cited "symptom_note" reply is kept
+    # here as a confounder (a competing explanation); it can never be the outcome_name.
+    confounders = [
+        n
+        for n in dict.fromkeys(metric_names)
+        if n != outcome_name
+    ]
     confounders.append("study_drug")
 
     unit = cited[0].unit if cited and cited[0].unit is not None else ""
@@ -203,6 +224,26 @@ def _dose_start_day(trial, participant_id: str) -> int:
     if participant is None:
         raise ValueError(f"unknown participant_id: {participant_id!r}")
     return participant.dose_start_day
+
+
+def _fatigue_rising(trial, participant_id: str, as_of) -> bool:
+    """True if fatigue >= 7 on >= 2 of the 4 trial days ending at ``as_of``.
+
+    Only fatigue readings knowable as of ``as_of`` (recorded_at <= as_of) count.
+    """
+    as_of_day = _as_of_trial_day(as_of)
+    window = range(as_of_day - 3, as_of_day + 1)
+    high_days = {
+        trial_day(r.event_time)
+        for r in trial.readings
+        if r.participant_id == participant_id
+        and r.name == "fatigue"
+        and r.recorded_at <= as_of
+        and trial_day(r.event_time) in window
+        and isinstance(r.value, (int, float))
+        and int(r.value) >= 7
+    }
+    return len(high_days) >= 2
 
 
 

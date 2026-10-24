@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import re
 
+from pulseeval.evaluation.text import clauses
+
 from trialpulse.core.models import Claim, GateCheck, Report, Signal
 from trialpulse.gate.adapter import EXPOSURE_TERMS, OUTCOME_TERMS
 from trialpulse.signals.baseline import MONITORED, PREDOSE_DAYS, personal_bands, trial_day
@@ -22,6 +24,45 @@ from trialpulse.signals.detect import detect
 
 # Exposure terms that mark a drug link; reuse the gate's exposure vocabulary.
 DRUG_TERMS = EXPOSURE_TERMS
+
+# Comparison phrases that refer to the pre-dose/pre-treatment baseline rather than a
+# drug link. These are removed before matching exposure terms, so that "dose" inside
+# "pre-dose" does not count as a drug link.
+_COMPARISON_PHRASES = (
+    "pre-dose",
+    "predose",
+    "pre-dosing",
+    "pre-treatment",
+    "pretreatment",
+    "before dosing",
+    "before the dose",
+    "prior to dosing",
+)
+
+# Single negation words; a clause is negated if it contains any of these as whole words
+# (case-insensitive), any word ending in "n't", or any of the negation phrases below.
+_NEGATION_WORDS = (
+    "not",
+    "no",
+    "never",
+    "without",
+    "cannot",
+    "unsupported",
+    "unrelated",
+    "unlikely",
+)
+
+# Multi-word negation phrases.
+_NEGATION_PHRASES = (
+    "no evidence",
+    "not supported",
+    "not established",
+    "does not",
+    "do not",
+    "did not",
+    "is not",
+    "are not",
+)
 
 
 def _mentions(text: str, terms: list[str]) -> bool:
@@ -33,10 +74,46 @@ def _mentions(text: str, terms: list[str]) -> bool:
     return False
 
 
+def _strip_comparison_phrases(text: str) -> str:
+    """Remove pre-dose/pre-treatment comparison phrases (case-insensitive)."""
+    for phrase in _COMPARISON_PHRASES:
+        text = re.sub(re.escape(phrase), " ", text, flags=re.IGNORECASE)
+    return text
+
+
+def _is_negated(clause: str) -> bool:
+    """True if ``clause`` contains a negation cue (case-insensitive, word boundaries)."""
+    lower = clause.lower()
+    for word in _NEGATION_WORDS:
+        if re.search(r"\b" + re.escape(word) + r"\b", lower):
+            return True
+    for phrase in _NEGATION_PHRASES:
+        if re.search(r"\b" + re.escape(phrase) + r"\b", lower):
+            return True
+    # Any contraction ending in "n't" (e.g. "didn't", "isn't", "wasn't").
+    if re.search(r"\b\w+n't\b", lower):
+        return True
+    return False
+
+
 def links_to_drug(claim: Claim) -> bool:
-    """A claim links a change to the study drug if it mentions an exposure term AND an
-    outcome term (both word-prefix, case-insensitive)."""
-    return _mentions(claim.text, DRUG_TERMS) and _mentions(claim.text, OUTCOME_TERMS)
+    """A claim links a change to the study drug if any clause is a non-negated drug link.
+
+    The text is split into clauses with pulseeval's ``clauses()``. A clause counts as a
+    drug link only when it mentions an exposure term AND an outcome term (both
+    word-prefix, case-insensitive) AND is not negated. This lets a claim that *denies* a
+    drug link ("... do not support a link ...") pass through the gate.
+
+    Pre-dose/pre-treatment comparison phrases are removed before matching, so that
+    referring to the pre-dose baseline is treated as a comparison, not a drug link.
+    """
+    text = _strip_comparison_phrases(claim.text)
+    for clause in clauses(text):
+        if _is_negated(clause):
+            continue
+        if _mentions(clause, DRUG_TERMS) and _mentions(clause, OUTCOME_TERMS):
+            return True
+    return False
 
 
 def _deviates(value: float, band: dict[str, float], direction: str) -> bool:

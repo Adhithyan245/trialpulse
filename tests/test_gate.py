@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from trialpulse.agent.deid import build_payload
 from trialpulse.core.models import Claim, Report
 from trialpulse.data.generator import TRIAL_START, generate
+from trialpulse.gate.adapter import relationship_case
 from trialpulse.gate.live import failed_claims, gate_report
 from trialpulse.signals.detect import detect
 
@@ -158,3 +159,54 @@ def test_failed_claims_lists_exactly_the_failing_claims():
 
     assert result.verdict == "hold"
     assert failed_claims(result) == ["C-bad"]
+
+
+
+def test_relationship_outcome_name_never_symptom_note():
+    """Citing a symptom_note reply alongside a monitored metric must not make the
+    outcome 'symptom_note': the most common cited MONITORED metric wins. The
+    symptom_note is kept as a confounder (a competing explanation), never the
+    outcome."""
+    trial = generate(7)
+    as_of = _day_time(15, 23)
+    signals = detect(trial, as_of)
+
+    claim = Claim(
+        claim_id="C-rel-monitored",
+        type="relationship",
+        text="Rising fatigue tracked physiological changes after dosing began.",
+        cited_record_ids=[
+            "P-07-d13-hrv_rmssd",
+            "P-07-d14-hrv_rmssd",
+            "P-31-d15-symptom_note",
+        ],
+    )
+    report = _report("P-07", as_of, [claim])
+
+    case = relationship_case(trial, report, claim, signals)
+
+    assert case.outcome_name == "hrv_rmssd"
+    assert case.outcome_name != "symptom_note"
+    assert "symptom_note" in case.confounder_names
+
+
+def test_relationship_outcome_fatigue_positive_when_rising():
+    """With no monitored metric cited but a fatigue reading cited, the outcome is
+    'fatigue' and its direction is 'positive' when fatigue >= 7 on >= 2 of the
+    4 trial days ending at as_of (P-07 is 7-8 on days 12-15)."""
+    trial = generate(7)
+    as_of = _day_time(15, 23)
+    signals = detect(trial, as_of)
+
+    claim = Claim(
+        claim_id="C-rel-fatigue",
+        type="relationship",
+        text="Fatigue rose over the recent days after dosing began.",
+        cited_record_ids=["P-07-d14-fatigue", "P-07-d15-fatigue"],
+    )
+    report = _report("P-07", as_of, [claim])
+
+    case = relationship_case(trial, report, claim, signals)
+
+    assert case.outcome_name == "fatigue"
+    assert case.observed_direction == "positive"

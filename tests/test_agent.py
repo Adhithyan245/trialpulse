@@ -244,3 +244,27 @@ def test_gemini_404_moves_on_without_sleeping(monkeypatch):
     assert result is good
     assert gm.name == "b"
     assert sleeps == []
+
+
+def test_gemini_network_error_retries_then_falls_back(monkeypatch):
+    import httpx
+
+    sleeps: list[float] = []
+    good = DraftReport(claims=[], abstained=True)
+
+    def a_behaviour():
+        raise httpx.RemoteProtocolError("boom")
+
+    def b_behaviour():
+        return _FakeResp(parsed=good)
+
+    client = _make_client({"a": a_behaviour, "b": b_behaviour})
+
+    gm = GeminiModel(api_key="k", models=["a", "b"], sleep=lambda s: sleeps.append(s))
+    gm._client = client
+
+    result = gm.generate("sys", "usr", DraftReport)
+    assert result is good
+    assert gm.name == "b"
+    # Network error retries with back-off 2 then 4, then moves to next model.
+    assert sleeps == [2, 4]

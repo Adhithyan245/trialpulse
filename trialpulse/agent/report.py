@@ -37,11 +37,16 @@ def draft_report(
     model: JSONModel,
     fault: str | None = None,
     report_seq: int = 1,
+    feedback: str | None = None,
 ) -> Report:
     """Draft a :class:`Report` for ``participant_id`` as of ``as_of``.
 
     ``fault`` (when given) appends a degrading instruction to the system prompt
     and is recorded in the prompt version. An unknown fault raises ValueError.
+
+    ``feedback`` (when given) is appended to the system prompt after any fault
+    text; it carries the reliability gate's hold reasons and new evidence for a
+    redraft.
     """
     if fault is not None and fault not in FAULTS:
         raise ValueError(f"unknown fault: {fault!r}")
@@ -50,7 +55,9 @@ def draft_report(
 
     system = SYSTEM_PROMPT
     if fault is not None:
-        system = SYSTEM_PROMPT + "\n" + FAULTS[fault]
+        system = system + "\n" + FAULTS[fault]
+    if feedback is not None:
+        system = system + "\n" + feedback
 
     draft = model.generate(system, build_user_prompt(payload), DraftReport)
 
