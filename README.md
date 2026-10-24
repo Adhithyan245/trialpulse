@@ -70,6 +70,7 @@ recorded runs in data/derived/validation.
    resting heart rate, amber when outside the personal band.
 2. The checkpoint: a tunnel of seven rings, one per PulseEval check, where failed claim
    cards stop and show a plain-language reason.
+   Try to fool the checkpoint: type your own claim about a participant (for example 'The study drug caused P-07's HRV drop') and the same deterministic checks judge it instantly, with no AI call.
 3. Sign and seal: the monitor signs and the report becomes a block on a linked chain; a
    tamper button breaks the chain from that block on.
 4. How this was verified: per claim, the cited readings, the recomputed number next to the
