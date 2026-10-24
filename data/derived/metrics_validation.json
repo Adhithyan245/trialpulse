@@ -1,0 +1,35 @@
+{
+ "cases": 12,
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ],
+ "raw": {
+  "held": 11,
+  "reached_monitor_unchecked": 12,
+  "by_dimension": {
+   "causal_restraint": 3,
+   "negative_control": 4,
+   "missing_data": 2,
+   "uncertainty": 6,
+   "recompute": 1,
+   "contradiction": 2
+  }
+ },
+ "pipeline": {
+  "passed_after_loop": 9,
+  "still_held": 3,
+  "unsafe_reaching_monitor": 0,
+  "mean_rounds": 2.25,
+  "evidence_requests": 19,
+  "replies": 12
+ },
+ "fault_cases": {
+  "raw_held": 6,
+  "total": 6
+ },
+ "clean_cases": {
+  "raw_held": 5,
+  "total": 6
+ },
+ "note": "Measured with PulseEval checks (commit db4e475) on synthetic data; numbers come from the recorded runs in data/derived/validation."
+}

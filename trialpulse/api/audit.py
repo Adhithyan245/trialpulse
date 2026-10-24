@@ -10,7 +10,7 @@ edits a row directly with SQL, simulating someone editing the database behind th
 application's back so the UI can show ``verify()`` catching it. Nothing in the normal
 application flow may call it.
 
-Standard library only: sqlite3, hashlib, json.
+Standard library only: sqlite3, hashlib, json, threading.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import threading
 from datetime import datetime
 
 from trialpulse.core.models import AuditEntry, Report
@@ -53,7 +54,12 @@ def _hash_fields(entry: dict) -> dict:
 
 
 class AuditLog:
-    """An append-only, hash-chained audit log backed by SQLite."""
+    """An append-only, hash-chained audit log backed by SQLite.
+    
+    Thread-safe: all reads and writes are guarded by a threading.Lock.
+    The SQLite connection is opened with check_same_thread=False to allow
+    use from FastAPI's worker thread pool.
+    """
 
     def __init__(self, path: str = "data/derived/audit.sqlite3") -> None:
         self.path = path
@@ -61,26 +67,29 @@ class AuditLog:
             parent = os.path.dirname(path)
             if parent:
                 os.makedirs(parent, exist_ok=True)
-        self._conn = sqlite3.connect(path)
+        self._conn = sqlite3.connect(path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
-        self._conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS audit(
-                seq INTEGER PRIMARY KEY AUTOINCREMENT,
-                entry_id TEXT UNIQUE,
-                ts TEXT,
-                actor_role TEXT,
-                action TEXT,
-                report_id TEXT,
-                details_json TEXT,
-                prev_hash TEXT,
-                entry_hash TEXT
+        self._lock = threading.Lock()
+        with self._lock:
+            self._conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS audit(
+                    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id TEXT UNIQUE,
+                    ts TEXT,
+                    actor_role TEXT,
+                    action TEXT,
+                    report_id TEXT,
+                    details_json TEXT,
+                    prev_hash TEXT,
+                    entry_hash TEXT
+                )
+                """
             )
-            """
-        )
-        self._conn.commit()
+            self._conn.commit()
 
     def _last(self) -> sqlite3.Row | None:
+        """Fetch the last entry. Caller must hold self._lock."""
         cur = self._conn.execute(
             "SELECT * FROM audit ORDER BY seq DESC LIMIT 1"
         )
@@ -94,64 +103,66 @@ class AuditLog:
         details: dict,
         ts: datetime,
     ) -> AuditEntry:
-        last = self._last()
-        prev_hash = last["entry_hash"] if last is not None else GENESIS
-        next_seq = (last["seq"] + 1) if last is not None else 1
-        entry_id = f"AUD-{next_seq:05d}"
-        ts_str = ts.isoformat()
-        details_json = json.dumps(details, sort_keys=True, default=str)
+        with self._lock:
+            last = self._last()
+            prev_hash = last["entry_hash"] if last is not None else GENESIS
+            next_seq = (last["seq"] + 1) if last is not None else 1
+            entry_id = f"AUD-{next_seq:05d}"
+            ts_str = ts.isoformat()
+            details_json = json.dumps(details, sort_keys=True, default=str)
 
-        fields = {
-            "entry_id": entry_id,
-            "ts": ts_str,
-            "actor_role": actor_role,
-            "action": action,
-            "report_id": report_id,
-            "details_json": details_json,
-            "prev_hash": prev_hash,
-        }
-        entry_hash = compute_hash(prev_hash, fields)
+            fields = {
+                "entry_id": entry_id,
+                "ts": ts_str,
+                "actor_role": actor_role,
+                "action": action,
+                "report_id": report_id,
+                "details_json": details_json,
+                "prev_hash": prev_hash,
+            }
+            entry_hash = compute_hash(prev_hash, fields)
 
-        self._conn.execute(
-            """
-            INSERT INTO audit(
-                entry_id, ts, actor_role, action, report_id,
-                details_json, prev_hash, entry_hash
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                entry_id,
-                ts_str,
-                actor_role,
-                action,
-                report_id,
-                details_json,
-                prev_hash,
-                entry_hash,
-            ),
-        )
-        self._conn.commit()
+            self._conn.execute(
+                """
+                INSERT INTO audit(
+                    entry_id, ts, actor_role, action, report_id,
+                    details_json, prev_hash, entry_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    entry_id,
+                    ts_str,
+                    actor_role,
+                    action,
+                    report_id,
+                    details_json,
+                    prev_hash,
+                    entry_hash,
+                ),
+            )
+            self._conn.commit()
 
-        return AuditEntry(
-            entry_id=entry_id,
-            ts=ts,
-            actor_role=actor_role,
-            action=action,
-            report_id=report_id,
-            details_json=details_json,
-            prev_hash=prev_hash,
-            entry_hash=entry_hash,
-        )
+            return AuditEntry(
+                entry_id=entry_id,
+                ts=ts,
+                actor_role=actor_role,
+                action=action,
+                report_id=report_id,
+                details_json=details_json,
+                prev_hash=prev_hash,
+                entry_hash=entry_hash,
+            )
 
     def entries(self, report_id: str | None = None) -> list[AuditEntry]:
-        if report_id is None:
-            cur = self._conn.execute("SELECT * FROM audit ORDER BY seq ASC")
-        else:
-            cur = self._conn.execute(
-                "SELECT * FROM audit WHERE report_id = ? ORDER BY seq ASC",
-                (report_id,),
-            )
-        return [self._row_to_entry(row) for row in cur.fetchall()]
+        with self._lock:
+            if report_id is None:
+                cur = self._conn.execute("SELECT * FROM audit ORDER BY seq ASC")
+            else:
+                cur = self._conn.execute(
+                    "SELECT * FROM audit WHERE report_id = ? ORDER BY seq ASC",
+                    (report_id,),
+                )
+            return [self._row_to_entry(row) for row in cur.fetchall()]
 
     @staticmethod
     def _row_to_entry(row: sqlite3.Row) -> AuditEntry:
@@ -168,45 +179,46 @@ class AuditLog:
 
     def verify(self) -> dict:
         """Recompute every hash in order and check the prev_hash chaining."""
-        cur = self._conn.execute("SELECT * FROM audit ORDER BY seq ASC")
-        rows = cur.fetchall()
+        with self._lock:
+            cur = self._conn.execute("SELECT * FROM audit ORDER BY seq ASC")
+            rows = cur.fetchall()
 
-        expected_prev = GENESIS
-        checked = 0
-        for row in rows:
-            checked += 1
-            if row["prev_hash"] != expected_prev:
-                return {
-                    "ok": False,
-                    "checked": checked,
-                    "first_bad_entry_id": row["entry_id"],
-                    "reason": "prev_hash does not match the previous entry's hash",
+            expected_prev = GENESIS
+            checked = 0
+            for row in rows:
+                checked += 1
+                if row["prev_hash"] != expected_prev:
+                    return {
+                        "ok": False,
+                        "checked": checked,
+                        "first_bad_entry_id": row["entry_id"],
+                        "reason": "prev_hash does not match the previous entry's hash",
+                    }
+                fields = {
+                    "entry_id": row["entry_id"],
+                    "ts": row["ts"],
+                    "actor_role": row["actor_role"],
+                    "action": row["action"],
+                    "report_id": row["report_id"],
+                    "details_json": row["details_json"],
+                    "prev_hash": row["prev_hash"],
                 }
-            fields = {
-                "entry_id": row["entry_id"],
-                "ts": row["ts"],
-                "actor_role": row["actor_role"],
-                "action": row["action"],
-                "report_id": row["report_id"],
-                "details_json": row["details_json"],
-                "prev_hash": row["prev_hash"],
+                recomputed = compute_hash(row["prev_hash"], fields)
+                if recomputed != row["entry_hash"]:
+                    return {
+                        "ok": False,
+                        "checked": checked,
+                        "first_bad_entry_id": row["entry_id"],
+                        "reason": "entry_hash does not match the recomputed hash",
+                    }
+                expected_prev = row["entry_hash"]
+
+            return {
+                "ok": True,
+                "checked": checked,
+                "first_bad_entry_id": None,
+                "reason": None,
             }
-            recomputed = compute_hash(row["prev_hash"], fields)
-            if recomputed != row["entry_hash"]:
-                return {
-                    "ok": False,
-                    "checked": checked,
-                    "first_bad_entry_id": row["entry_id"],
-                    "reason": "entry_hash does not match the recomputed hash",
-                }
-            expected_prev = row["entry_hash"]
-
-        return {
-            "ok": True,
-            "checked": checked,
-            "first_bad_entry_id": None,
-            "reason": None,
-        }
 
 
 def record_loop(log: AuditLog, loop: LoopResult, ts: datetime) -> list[AuditEntry]:
@@ -359,25 +371,43 @@ def sign(
     )
 
 
-def tamper_for_demo(path_or_conn, entry_id: str, new_details: dict) -> None:
+def tamper_for_demo(path_or_conn_or_log: str | sqlite3.Connection | AuditLog, entry_id: str, new_details: dict) -> None:
     """Edit one row's details_json directly with SQL, behind the log's back.
 
     This exists ONLY for the tamper demonstration: it bypasses the append-only API
     so the interface can show ``verify()`` detecting the break. Do not call it from
     normal application code.
+    
+    Accepts three types:
+    - An AuditLog instance: uses its connection and lock for thread safety.
+    - A sqlite3.Connection: uses it directly without acquiring a lock.
+    - A file path (string): opens, edits, commits, and closes.
     """
     own_conn = False
-    if isinstance(path_or_conn, sqlite3.Connection):
-        conn = path_or_conn
+    lock = None
+    
+    if isinstance(path_or_conn_or_log, AuditLog):
+        conn = path_or_conn_or_log._conn
+        lock = path_or_conn_or_log._lock
+    elif isinstance(path_or_conn_or_log, sqlite3.Connection):
+        conn = path_or_conn_or_log
+        lock = None
     else:
-        conn = sqlite3.connect(path_or_conn)
+        conn = sqlite3.connect(path_or_conn_or_log)
         own_conn = True
+        lock = None
 
-    new_json = json.dumps(new_details, sort_keys=True, default=str)
-    conn.execute(
-        "UPDATE audit SET details_json = ? WHERE entry_id = ?",
-        (new_json, entry_id),
-    )
-    conn.commit()
-    if own_conn:
-        conn.close()
+    try:
+        if lock:
+            lock.acquire()
+        new_json = json.dumps(new_details, sort_keys=True, default=str)
+        conn.execute(
+            "UPDATE audit SET details_json = ? WHERE entry_id = ?",
+            (new_json, entry_id),
+        )
+        conn.commit()
+    finally:
+        if lock:
+            lock.release()
+        if own_conn:
+            conn.close()
