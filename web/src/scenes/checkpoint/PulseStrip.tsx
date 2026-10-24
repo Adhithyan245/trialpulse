@@ -126,6 +126,7 @@ export function PulseStrip({
       viewBox={`0 0 ${width} ${height}`}
       width="100%"
       height="auto"
+      style={{ display: "block" }}
       className="border border-line rounded bg-card"
       role="img"
       aria-label={`HRV strip for days 1 to ${currentDay}`}

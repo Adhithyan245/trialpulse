@@ -79,7 +79,7 @@ export function EvidenceInbox({ requests, replies, step = "desk" }: EvidenceInbo
                       <span className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-xs text-muted">
                         Simulated reply
                       </span>
-                      <span className="font-mono text-xs text-muted tabular-nums">
+                      <span className="font-mono text-xs text-muted tabular-nums break-words">
                         {reply.record_id}
                       </span>
                     </div>

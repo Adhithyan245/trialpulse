@@ -94,11 +94,6 @@ export function Scene1Trial() {
 
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
-      {/* Synthetic data ribbon */}
-      <div className="mb-6 p-3 bg-watch-soft border border-watch text-watch rounded text-center font-medium">
-        Synthetic data
-      </div>
-
       <div className="max-w-7xl mx-auto space-y-6">
         <h1 className="text-3xl font-semibold text-text">
           Scene 1: The trial, alive

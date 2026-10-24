@@ -30,42 +30,6 @@ const SITE_COUNTIES: Record<string, string> = {
   S03: "Hampden",
 };
 
-// Place participants in concentric rings around the site anchor
-function getParticipantPosition(
-  siteId: string,
-  indexInSite: number
-): [number, number] {
-  const anchor = SITE_ANCHORS[siteId];
-  if (!anchor) return [0, 0];
-
-  if (indexInSite === 0) return anchor;
-
-  // First ring: 6 participants
-  // Second ring: 12 participants
-  const ring1Size = 6;
-  const ring2Size = 12;
-
-  let ring = 0;
-  let posInRing = indexInSite - 1;
-
-  if (posInRing < ring1Size) {
-    ring = 1;
-  } else {
-    ring = 2;
-    posInRing -= ring1Size;
-  }
-
-  const radiusPx = 9 * ring; // 9px apart
-  const pointsInRing = ring === 1 ? ring1Size : ring2Size;
-  const angle = (posInRing / pointsInRing) * 2 * Math.PI;
-
-  // Convert pixel offset to approximate lon/lat offset (very rough)
-  const lonOffset = (radiusPx * Math.cos(angle)) / 5000;
-  const latOffset = (radiusPx * Math.sin(angle)) / 5000;
-
-  return [anchor[0] + lonOffset, anchor[1] + latOffset];
-}
-
 export function MapView({
   sites,
   participants,
@@ -96,8 +60,12 @@ export function MapView({
 
   const width = 800;
   const height = 600;
+  const padding = 16;
 
-  const projection = geoMercator().fitSize([width, height], geoData);
+  const projection = geoMercator().fitExtent(
+    [[padding, padding], [width - padding, height - padding]],
+    geoData
+  );
   const pathGenerator = geoPath().projection(projection);
 
   // Group participants by site
@@ -109,29 +77,75 @@ export function MapView({
     participantsBySite[p.site_id].push(p);
   });
 
-  // Generate participant positions
+  // Generate participant positions: offsets in SCREEN pixels after projecting
+  // the site anchor. Ring 1: 6 dots at 12px radius, Ring 2: 12 dots at 24px,
+  // Ring 3: rest at 36px. Angle evenly spaced, starting at -90deg.
   const participantPositions = participants.map((p) => {
+    const anchor = SITE_ANCHORS[p.site_id];
+    if (!anchor) return { participant: p, x: 0, y: 0 };
+
+    const anchorCoords = projection(anchor);
+    const anchorX = anchorCoords?.[0] ?? 0;
+    const anchorY = anchorCoords?.[1] ?? 0;
+
     const siteParticipants = participantsBySite[p.site_id] || [];
     const indexInSite = siteParticipants.indexOf(p);
-    const [lon, lat] = getParticipantPosition(p.site_id, indexInSite);
-    const coords = projection([lon, lat]);
-    return {
-      participant: p,
-      x: coords?.[0] ?? 0,
-      y: coords?.[1] ?? 0,
-    };
+
+    if (indexInSite === 0) {
+      return { participant: p, x: anchorX, y: anchorY };
+    }
+
+    // Determine ring and position
+    const ring1Size = 6;
+    const ring2Size = 12;
+    let ring = 1;
+    let posInRing = indexInSite - 1;
+
+    if (posInRing >= ring1Size) {
+      if (posInRing < ring1Size + ring2Size) {
+        ring = 2;
+        posInRing -= ring1Size;
+      } else {
+        ring = 3;
+        posInRing -= ring1Size + ring2Size;
+      }
+    }
+
+    const radiusPx = ring === 1 ? 12 : ring === 2 ? 24 : 36;
+    const pointsInRing = ring === 1 ? ring1Size : ring === 2 ? ring2Size : Math.max(1, siteParticipants.length - ring1Size - ring2Size);
+    const angle = -Math.PI / 2 + (posInRing / pointsInRing) * 2 * Math.PI; // Start at -90deg
+
+    const x = anchorX + radiusPx * Math.cos(angle);
+    const y = anchorY + radiusPx * Math.sin(angle);
+
+    return { participant: p, x, y };
   });
 
-  // Site label positions (next to the cluster)
+  // Site label positions: to the right of the outer ring
   const siteLabelPositions = sites.map((site) => {
     const anchor = SITE_ANCHORS[site.site_id];
     if (!anchor) return null;
     const coords = projection(anchor);
     const count = participantsBySite[site.site_id]?.length ?? 0;
+    
+    // Determine outer ring radius based on participant count
+    const ring1Size = 6;
+    const ring2Size = 12;
+    let outerRadius = 12; // Default to ring 1
+    if (count > 1 + ring1Size + ring2Size) {
+      outerRadius = 36; // Ring 3
+    } else if (count > 1 + ring1Size) {
+      outerRadius = 24; // Ring 2
+    } else if (count > 1) {
+      outerRadius = 12; // Ring 1
+    } else {
+      outerRadius = 0; // Single participant
+    }
+
     return {
       site,
-      x: (coords?.[0] ?? 0) + 30,
-      y: (coords?.[1] ?? 0) - 20,
+      x: (coords?.[0] ?? 0) + outerRadius + 10, // To the right of outer ring
+      y: (coords?.[1] ?? 0),
       count,
     };
   });
@@ -159,8 +173,9 @@ export function MapView({
               <path
                 d={d || ""}
                 fill="var(--card)"
-                stroke="var(--line)"
-                strokeWidth={isSiteCounty ? 2 : 1}
+                stroke="var(--muted)"
+                strokeOpacity={isSiteCounty ? 1 : 0.55}
+                strokeWidth="1"
               />
               {isSiteCounty && (
                 <text
@@ -173,7 +188,7 @@ export function MapView({
                     height / 2
                   }
                   textAnchor="middle"
-                  fontSize="11"
+                  fontSize="10"
                   fill="var(--muted)"
                   className="pointer-events-none"
                 >
@@ -251,7 +266,7 @@ export function MapView({
               <circle
                 cx={x}
                 cy={y}
-                r="4"
+                r="4.5"
                 fill={isHollow ? "none" : "var(--accent)"}
                 stroke="var(--accent)"
                 strokeWidth="1.5"

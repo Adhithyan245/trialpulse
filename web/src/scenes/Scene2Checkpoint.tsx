@@ -241,7 +241,7 @@ export function Scene2Checkpoint() {
             <div className="text-sm space-y-1">
               <div>
                 <span className="text-muted">ID:</span>{" "}
-                <span className="font-mono">{runData.participant_id}</span>
+                <span className="font-mono break-words">{runData.participant_id}</span>
               </div>
               <div>
                 <span className="text-muted">Trial day:</span> {runData.day}
@@ -279,10 +279,12 @@ export function Scene2Checkpoint() {
           <div>
             <h2 className="text-lg font-semibold mb-2">The checkpoint</h2>
             <div className="text-xs text-muted space-y-1">
-              <div>
-                Draft {draftIndex + 1} of {runData.pipeline.drafts.length} ·{" "}
-                <span className="font-mono">{currentDraft.model_id}</span> ·{" "}
-                <span className="font-mono">{currentDraft.prompt_version}</span>
+              <div className="flex flex-wrap items-center gap-x-2">
+                <span>Draft {draftIndex + 1} of {runData.pipeline.drafts.length}</span>
+                <span>·</span>
+                <span className="font-mono break-words">{currentDraft.model_id}</span>
+                <span>·</span>
+                <span className="font-mono break-words">{currentDraft.prompt_version}</span>
               </div>
               {runData.recorded && (
                 <div className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-muted">

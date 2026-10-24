@@ -1,11 +1,58 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, RefreshCw, Search } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { metrics, searchTrials } from "../api";
 import type { Metrics, PublicMetrics, TrialRow } from "../types";
 import { RINGS } from "../checks";
 
 function ValidationScorecard({ validation }: { validation: Metrics["validation"] }) {
+  const [colors, setColors] = useState({
+    accent: "",
+    text: "",
+    muted: "",
+    line: "",
+  });
+
+  useEffect(() => {
+    // Read CSS variable values at runtime for Recharts
+    const updateColors = () => {
+      const root = document.documentElement;
+      const style = getComputedStyle(root);
+      setColors({
+        accent: style.getPropertyValue("--accent").trim(),
+        text: style.getPropertyValue("--text").trim(),
+        muted: style.getPropertyValue("--muted").trim(),
+        line: style.getPropertyValue("--line").trim(),
+      });
+    };
+
+    updateColors();
+
+    // Watch for theme changes via data-theme attribute
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes" && mutation.attributeName === "data-theme") {
+          updateColors();
+        }
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    // Watch for theme changes via matchMedia
+    const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => updateColors();
+    darkModeQuery.addEventListener("change", handleChange);
+
+    return () => {
+      observer.disconnect();
+      darkModeQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
   if (!validation) {
     return (
       <div className="rounded-lg border border-line bg-surface p-8 text-center text-muted">
@@ -14,40 +61,46 @@ function ValidationScorecard({ validation }: { validation: Metrics["validation"]
     );
   }
 
-  // Prepare chart data
-  const chartData = Object.entries(validation.raw.by_dimension).map(([dim, count]) => {
+  // Aggregate raw failures by ring instead of dimension
+  const ringCounts: Record<string, number> = {};
+  for (const [dim, count] of Object.entries(validation.raw.by_dimension)) {
     const ring = RINGS.find((r) => r.dims.includes(dim));
-    return {
-      dimension: ring?.label || dim,
-      failures: count,
-    };
-  });
+    if (ring) {
+      ringCounts[ring.id] = (ringCounts[ring.id] || 0) + count;
+    }
+  }
+
+  // Build chart data in RINGS order, skipping rings with 0 counts
+  const chartData = RINGS.map((ring) => ({
+    ring: ring.label,
+    failures: ringCounts[ring.id] || 0,
+  })).filter((d) => d.failures > 0);
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-line bg-surface p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Raw AI drafts held</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.raw.held} of {validation.cases}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Clean cases held</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.clean_cases.raw_held} of {validation.clean_cases.total}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Passed after evidence loop</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.pipeline.passed_after_loop} of {validation.cases}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Unsafe reaching monitor</div>
           <div className="mt-1 font-mono text-2xl tabular-nums text-pass">
             {validation.pipeline.unsafe_reaching_monitor}
@@ -55,22 +108,22 @@ function ValidationScorecard({ validation }: { validation: Metrics["validation"]
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-line bg-surface p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Mean rounds</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.pipeline.mean_rounds.toFixed(2)}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Evidence requests</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.pipeline.evidence_requests}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Replies received</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {validation.pipeline.replies}
@@ -79,18 +132,14 @@ function ValidationScorecard({ validation }: { validation: Metrics["validation"]
       </div>
 
       <div>
-        <h3 className="mb-3 font-medium">Raw failures by dimension</h3>
+        <h3 className="mb-3 font-medium">Raw failures by ring</h3>
         <div className="rounded-lg border border-line bg-surface p-4">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 20, left: 100, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-line" />
-              <XAxis type="number" className="text-xs" tick={{ fill: "var(--color-text)" }} />
-              <YAxis type="category" dataKey="dimension" className="text-xs" tick={{ fill: "var(--color-text)" }} />
-              <Bar dataKey="failures" radius={[0, 4, 4, 0]}>
-                {chartData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill="var(--color-accent)" />
-                ))}
-              </Bar>
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.line} />
+              <XAxis type="number" className="text-xs" tick={{ fill: colors.text }} />
+              <YAxis type="category" dataKey="ring" className="text-xs" tick={{ fill: colors.text }} />
+              <Bar dataKey="failures" fill={colors.accent} radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -202,22 +251,22 @@ function TrialFinder({ publicMetrics }: { publicMetrics: PublicMetrics | null })
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-line bg-surface p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Total recruiting trials</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {publicMetrics.total_trials || 0}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">Wearable-measurable</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {publicMetrics.wearable_measurable_trials || 0}
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface p-4">
+        <div className="rounded-lg border border-line bg-surface p-4 min-w-0">
           <div className="text-sm text-muted">With MA city</div>
           <div className="mt-1 font-mono text-2xl tabular-nums">
             {publicMetrics.trials_with_ma_city || 0}
