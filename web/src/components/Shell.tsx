@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Menu, Monitor, Moon, Sun, X } from "lucide-react";
 import { health } from "../api";
 import { useRole } from "../role";
 import type { Role } from "../types";
@@ -177,30 +177,80 @@ function NavLinks({ currentHash }: { currentHash: string }) {
 
 export function Shell({ children }: { children: ReactNode }) {
   const currentHash = useCurrentHash();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close menu on hash change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [currentHash]);
+
+  // Close menu on Escape key
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
+  const currentScene = SCENES.find((s) => s.hash === currentHash);
+  const currentSceneLabel = currentScene?.label || "TrialPulse";
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      {/* Navigation: left column on desktop, top bar under 768px. */}
-      <header className="flex flex-col gap-4 bg-ink p-4 text-white md:w-64 md:shrink-0">
+      {/* Mobile header (< 768px) */}
+      <header className="flex items-center justify-between border-b border-line bg-ink p-4 text-white md:hidden">
+        <Wordmark />
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-300">{currentSceneLabel}</span>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-expanded={menuOpen}
+            aria-label="Menu"
+            className="rounded-md p-1.5 hover:bg-white/10"
+          >
+            {menuOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile menu panel */}
+      {menuOpen && (
+        <div className="border-b border-white/10 bg-ink p-4 text-white md:hidden">
+          <NavLinks currentHash={currentHash} />
+          <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
+            <RoleSwitcher />
+            <div className="flex items-center justify-between">
+              <ModeBadge />
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar (>= 768px) */}
+      <aside className="hidden flex-col gap-4 bg-ink p-4 text-white md:flex md:w-64 md:shrink-0">
         <div className="flex items-center justify-between">
           <Wordmark />
-          <div className="md:hidden">
-            <ThemeToggle />
-          </div>
         </div>
         <NavLinks currentHash={currentHash} />
         <div className="flex flex-col gap-3 border-t border-white/10 pt-3">
           <RoleSwitcher />
           <div className="flex items-center justify-between">
             <ModeBadge />
-            <div className="hidden md:block">
-              <ThemeToggle />
-            </div>
+            <ThemeToggle />
           </div>
         </div>
-      </header>
+      </aside>
 
-      {/* Working area. */}
+      {/* Working area */}
       <div className="flex min-w-0 flex-1 flex-col bg-surface">
         <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-watch-soft px-4 py-1.5 text-sm text-watch">
           <span className="inline-block h-2 w-2 rounded-full bg-watch" aria-hidden="true" />

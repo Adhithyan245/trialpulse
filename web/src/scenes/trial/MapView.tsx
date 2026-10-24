@@ -155,7 +155,7 @@ export function MapView({
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
-        height="auto"
+        style={{ height: "auto" }}
         className="border border-line rounded bg-card"
         role="img"
         aria-label="Massachusetts trial map with participant locations"

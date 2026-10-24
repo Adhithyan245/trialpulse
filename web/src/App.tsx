@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Shell } from "./components/Shell";
 import { Landing } from "./components/Landing";
+import { Tour } from "./components/Tour";
 import { Scene1Trial } from "./scenes/Scene1Trial";
 import { Scene2Checkpoint } from "./scenes/Scene2Checkpoint";
 import { Scene3Seal } from "./scenes/Scene3Seal";
@@ -22,9 +23,12 @@ export default function App() {
 
   if (hash === "#/" || hash === "") {
     return (
-      <Shell>
-        <Landing />
-      </Shell>
+      <>
+        <Shell>
+          <Landing />
+        </Shell>
+        <Tour />
+      </>
     );
   }
 
@@ -49,5 +53,10 @@ export default function App() {
       scene = <Landing />;
   }
 
-  return <Shell>{scene}</Shell>;
+  return (
+    <>
+      <Shell>{scene}</Shell>
+      <Tour />
+    </>
+  );
 }
