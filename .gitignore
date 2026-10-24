@@ -9,6 +9,7 @@ data/derived/*
 !data/derived/metrics*.json
 !data/derived/validation/
 !data/derived/trial_locations.json
+!data/derived/clock.json
 *.sqlite3
 .env
 .kiro/runs/

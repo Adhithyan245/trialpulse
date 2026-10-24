@@ -1,0 +1,11 @@
+.venv
+node_modules
+web/node_modules
+web/dist
+.git
+.kiro/runs
+.pytest_cache
+__pycache__
+*.sqlite3
+.env
+.claude

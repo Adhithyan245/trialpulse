@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: trialpulse
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: TP_LIVE_MODE
+        value: "0"
+      - key: GEMINI_API_KEY
+        sync: false
