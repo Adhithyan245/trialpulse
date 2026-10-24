@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useReducedMotion } from "motion/react";
 import { Play, Pause, SkipForward, RotateCcw } from "lucide-react";
 import { run, runs, participantSeries } from "../api";
@@ -11,6 +11,17 @@ import { EvidenceInbox } from "./checkpoint/EvidenceInbox";
 import { MonitorDesk } from "./checkpoint/MonitorDesk";
 import { useSequence, requestsForRound, type SequenceStep } from "./checkpoint/useSequence";
 import { checksForClaim, reportLevelChecks } from "../checks";
+
+// Lazy load 3D components so the 2D path doesn't download three.js. Tunnel3D is
+// the ONLY module in this scene that imports three / @react-three/*, and it is
+// reached exclusively through this dynamic import, so Rollup keeps it (and
+// three) in a separate chunk that never enters the main bundle.
+const Tunnel3D = lazy(() => import("./checkpoint/Tunnel3D"));
+const WebGLBoundary = lazy(() =>
+  import("./checkpoint/WebGLBoundary").then((m) => ({
+    default: m.WebGLBoundary,
+  }))
+);
 
 interface SeriesData {
   participant_id: string;
@@ -44,6 +55,19 @@ export function Scene2Checkpoint() {
   const [loading, setLoading] = useState(true);
 
   const reducedMotion = useReducedMotion();
+
+  // Determine default mode: 3D if WebGL available and no reduced motion preference
+  const [mode3D, setMode3D] = useState<boolean>(() => {
+    if (reducedMotion) return false;
+    try {
+      const canvas = document.createElement("canvas");
+      const context =
+        canvas.getContext("webgl2") || canvas.getContext("webgl");
+      return context !== null;
+    } catch {
+      return false;
+    }
+  });
 
   // Load run list
   useEffect(() => {
@@ -222,6 +246,32 @@ export function Scene2Checkpoint() {
         >
           {sequence.speed}x
         </button>
+        <div className="flex rounded border border-line bg-card overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setMode3D(true)}
+            className={`px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
+              mode3D
+                ? "bg-accent text-white"
+                : "text-text hover:bg-surface"
+            }`}
+            aria-label="3D mode"
+          >
+            3D
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode3D(false)}
+            className={`px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
+              !mode3D
+                ? "bg-accent text-white"
+                : "text-text hover:bg-surface"
+            }`}
+            aria-label="2D mode"
+          >
+            2D
+          </button>
+        </div>
         <div className="text-sm text-muted">
           {sequence.step.type === "intro" && "Intro"}
           {sequence.step.type === "travel" && `Checking claim ${sequence.step.claimIndex + 1}`}
@@ -299,6 +349,7 @@ export function Scene2Checkpoint() {
             gate={currentGate}
             step={sequence.step}
             reducedMotion={!!reducedMotion}
+            mode3D={mode3D}
           />
 
           {/* Verdict pill - only show at verdict step */}
@@ -358,6 +409,7 @@ interface CheckpointVisualizationProps {
   gate: GateResult;
   step: SequenceStep;
   reducedMotion: boolean;
+  mode3D: boolean;
 }
 
 function CheckpointVisualization({
@@ -365,15 +417,47 @@ function CheckpointVisualization({
   gate,
   step,
   reducedMotion,
+  mode3D,
 }: CheckpointVisualizationProps) {
   return (
     <div className="space-y-4">
-      <RingTunnel
-        draft={draft}
-        gate={gate}
-        step={step}
-        reducedMotion={reducedMotion}
-      />
+      {mode3D ? (
+        <Suspense
+          fallback={
+            <RingTunnel
+              draft={draft}
+              gate={gate}
+              step={step}
+              reducedMotion={reducedMotion}
+            />
+          }
+        >
+          <WebGLBoundary
+            fallback={
+              <RingTunnel
+                draft={draft}
+                gate={gate}
+                step={step}
+                reducedMotion={reducedMotion}
+              />
+            }
+          >
+            <Tunnel3D
+              draft={draft}
+              gate={gate}
+              step={step}
+              reducedMotion={reducedMotion}
+            />
+          </WebGLBoundary>
+        </Suspense>
+      ) : (
+        <RingTunnel
+          draft={draft}
+          gate={gate}
+          step={step}
+          reducedMotion={reducedMotion}
+        />
+      )}
 
       {/* Current claim panel - show when traveling or after */}
       {step.type === "travel" && (
