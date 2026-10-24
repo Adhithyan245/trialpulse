@@ -10,12 +10,16 @@ import re
 from collections import Counter
 
 from pulseeval.agent import AgentTrace
-from pulseeval.scenarios import RelationshipCase
+from pulseeval.evaluation.text import coverage_claims
+from pulseeval.scenarios import AssessmentCase, NumericCase, RelationshipCase
 from pulseeval.timeline import MemberTimeline, Record
 
-from trialpulse.core.models import Claim, Report, Signal
-from trialpulse.data.generator import _day_time
-from trialpulse.signals.baseline import MONITORED
+from trialpulse.core.models import Claim, GateCheck, Report, Signal
+from trialpulse.data.generator import TRIAL_START, _day_time
+from trialpulse.signals.baseline import MONITORED, trial_day
+
+# Conclusion words the certainty check watches for (a confident "all clear").
+CERTAINTY_CONCLUSION_TERMS = ["normal", "stable", "safe", "no concern", "recovered", "fine"]
 
 # The PulseEval commit this gate is wired against.
 PULSEEVAL_COMMIT = "db4e475"
@@ -199,3 +203,312 @@ def _dose_start_day(trial, participant_id: str) -> int:
     if participant is None:
         raise ValueError(f"unknown participant_id: {participant_id!r}")
     return participant.dose_start_day
+
+
+
+# --- knowable-reading helpers ----------------------------------------------
+
+
+def _known_readings(trial, participant_id: str, as_of):
+    """This participant's readings knowable at ``as_of`` (recorded_at <= as_of)."""
+    return [
+        r
+        for r in trial.readings
+        if r.participant_id == participant_id and r.recorded_at <= as_of
+    ]
+
+
+def _as_of_trial_day(as_of) -> int:
+    """Trial day (1-based) that ``as_of`` falls on."""
+    return (as_of.date() - TRIAL_START.date()).days + 1
+
+
+# --- coverage (missing-data) check -----------------------------------------
+
+
+def coverage_applies(claim: Claim) -> bool:
+    """A claim needs the coverage check if it is a coverage claim or talks about coverage."""
+    if claim.type == "coverage":
+        return True
+    c = coverage_claims(claim.text)
+    return bool(
+        c.completeness_claimed
+        or c.gap_acknowledged
+        or c.available
+        or c.total
+        or c.missing
+    )
+
+
+def coverage_case(trial, report: Report, claim: Claim) -> NumericCase:
+    """A rule-labelled NumericCase measuring resting_hr day coverage for ``claim``.
+
+    A worn day is a day with a resting_hr reading. The window runs from the first
+    trial day of the report window through the as-of trial day (inclusive); the
+    answer check is disabled (tolerance 1000.0) because only coverage is judged.
+    """
+    first_day = trial_day(report.window_start)
+    as_of_day = _as_of_trial_day(report.as_of)
+    expected_observations = as_of_day - first_day + 1
+    window_start = _day_time(first_day, 7)
+
+    known = _known_readings(trial, report.participant_id, report.as_of)
+    rhr = [
+        r
+        for r in known
+        if r.name == "resting_hr" and first_day <= trial_day(r.event_time) <= as_of_day
+    ]
+    rhr.sort(key=lambda r: (r.event_time, r.record_id))
+    expected_record_ids = [r.record_id for r in rhr]
+    values = [float(r.value) for r in rhr if isinstance(r.value, (int, float))]
+    expected_value = sum(values) / len(values) if values else 0.0
+
+    timeline = MemberTimeline(member_id=report.participant_id, records=list(rhr))
+
+    return NumericCase(
+        case_id=f"{claim.claim_id}-coverage",
+        description="rule-labelled resting_hr coverage check",
+        timeline=timeline,
+        question="How complete is the resting heart rate record for this window?",
+        as_of=report.as_of,
+        target_name="resting_hr",
+        provenance="TrialPulse gate rules",
+        window_start=window_start,
+        expected_value=expected_value,
+        unit="bpm",
+        tolerance=1000.0,
+        expected_record_ids=expected_record_ids,
+        expected_observations=expected_observations,
+    )
+
+
+def coverage_from_data(trial, report: Report) -> tuple[int, int, list[int]]:
+    """Resting_hr day coverage computed from the data for this report's window.
+
+    Returns ``(available, expected_observations, missing_days)`` where a day counts as
+    available when it has a knowable resting_hr reading. The window runs from the first
+    trial day of the report window through the as-of trial day (inclusive).
+    """
+    first_day = trial_day(report.window_start)
+    as_of_day = _as_of_trial_day(report.as_of)
+    expected_observations = as_of_day - first_day + 1
+
+    known = _known_readings(trial, report.participant_id, report.as_of)
+    worn_days = {
+        trial_day(r.event_time)
+        for r in known
+        if r.name == "resting_hr" and first_day <= trial_day(r.event_time) <= as_of_day
+    }
+    available = len(worn_days)
+    missing_days = [d for d in range(first_day, as_of_day + 1) if d not in worn_days]
+    return available, expected_observations, missing_days
+
+
+def coverage_override(trial, report: Report, claim: Claim) -> GateCheck | None:
+    """Decide a complete-data coverage claim from the data, bypassing PulseEval.
+
+    PulseEval's ``coverage_claims`` parser marks both ``completeness_claimed`` and
+    ``gap_acknowledged`` for common "complete ... no missing data" phrasings because it
+    reads "missing" as a gap acknowledgement even under negation. When both hold the
+    claim means "complete, no gaps", so we judge it against the data instead.
+
+    Returns a GateCheck keyed ``f"missing_data:{claim.claim_id}"`` when the override
+    applies, or None when it does not (caller should use the PulseEval result).
+    """
+    cov = coverage_claims(claim.text)
+    if not (cov.completeness_claimed and cov.gap_acknowledged):
+        return None
+
+    available, expected, missing_days = coverage_from_data(trial, report)
+    if available == expected:
+        explanation = (
+            f"complete-data claim matches the data ({available} of {expected} days); "
+            "PulseEval parser read 'missing' as a gap, overridden by rule"
+        )
+        passed = True
+    else:
+        missing = ", ".join(str(d) for d in missing_days)
+        explanation = (
+            f"claims complete data but only {available} of {expected} days are "
+            f"available; missing: [{missing}]"
+        )
+        passed = False
+    return GateCheck(
+        dimension=f"missing_data:{claim.claim_id}",
+        passed=passed,
+        explanation=explanation,
+    )
+
+
+# --- contradiction (wearable vs diary) check -------------------------------
+
+_WEARABLE_SELF = {"fatigue", "symptom_note"}
+
+
+def _recent_fatigue(known, as_of) -> tuple[list, int | None]:
+    """Fatigue readings in the last 3 trial days known as of ``as_of`` and their max value."""
+    as_of_day = _as_of_trial_day(as_of)
+    last3 = range(as_of_day - 2, as_of_day + 1)
+    fatigue = [
+        r
+        for r in known
+        if r.name == "fatigue"
+        and trial_day(r.event_time) in last3
+        and isinstance(r.value, (int, float))
+    ]
+    max_fatigue = max((int(r.value) for r in fatigue), default=None)
+    return fatigue, max_fatigue
+
+
+def contradiction_applies(trial, report: Report, signals: list[Signal]) -> bool:
+    """Whether the contradiction check applies to this report's participant."""
+    pid = report.participant_id
+    if any(s.participant_id == pid and s.type == "diary_conflict" for s in signals):
+        return True
+    has_drift = any(s.participant_id == pid and s.type == "drift" for s in signals)
+    if has_drift:
+        return False
+    known = _known_readings(trial, pid, report.as_of)
+    as_of_day = _as_of_trial_day(report.as_of)
+    last3 = range(as_of_day - 2, as_of_day + 1)
+    high_days = {
+        trial_day(r.event_time)
+        for r in known
+        if r.name == "fatigue"
+        and trial_day(r.event_time) in last3
+        and isinstance(r.value, (int, float))
+        and int(r.value) >= 8
+    }
+    return len(high_days) >= 2
+
+
+def contradiction_case(trial, report: Report, signals: list[Signal]) -> AssessmentCase:
+    """A rule-labelled AssessmentCase comparing today's wearable data with the diary."""
+    pid = report.participant_id
+    known = _known_readings(trial, pid, report.as_of)
+    as_of_day = _as_of_trial_day(report.as_of)
+
+    # Wearable readings on the as-of trial day; else the latest day with any wearable.
+    def _wearable_on(day: int):
+        return [
+            r
+            for r in known
+            if r.source == "wearable" and trial_day(r.event_time) == day
+        ]
+
+    wearable = _wearable_on(as_of_day)
+    if not wearable:
+        wearable_days = sorted(
+            {trial_day(r.event_time) for r in known if r.source == "wearable"}
+        )
+        if wearable_days:
+            wearable = _wearable_on(wearable_days[-1])
+    wearable_ids = [r.record_id for r in wearable]
+
+    _, max_fatigue = _recent_fatigue(known, report.as_of)
+    last3 = range(as_of_day - 2, as_of_day + 1)
+    self_reports = [
+        r
+        for r in known
+        if r.name in _WEARABLE_SELF and trial_day(r.event_time) in last3
+    ]
+    self_reports.sort(key=lambda r: (r.event_time, r.record_id))
+    self_report_ids = [r.record_id for r in self_reports]
+
+    has_drift = any(s.participant_id == pid and s.type == "drift" for s in signals)
+    wearable_indicates = "poor" if has_drift else "good"
+    if max_fatigue is not None and max_fatigue >= 8:
+        self_report_indicates = "poor"
+    elif max_fatigue is not None and max_fatigue <= 4:
+        self_report_indicates = "good"
+    else:
+        self_report_indicates = None
+
+    relevant_names = sorted({r.name for r in wearable} | {r.name for r in self_reports})
+
+    timeline = MemberTimeline(
+        member_id=pid, records=list(wearable) + list(self_reports)
+    )
+
+    window_start = _day_time(trial_day(report.window_start), 7)
+    return AssessmentCase(
+        case_id=f"{report.report_id}-contradiction",
+        description="rule-labelled wearable-vs-diary check",
+        timeline=timeline,
+        question="How is the participant doing, given the wearable data and the diary?",
+        as_of=report.as_of,
+        target_name="recovery",
+        provenance="TrialPulse gate rules",
+        window_start=window_start,
+        wearable_record_ids=wearable_ids,
+        self_report_record_ids=self_report_ids,
+        wearable_indicates=wearable_indicates,
+        self_report_indicates=self_report_indicates,
+        relevant_names=relevant_names,
+    )
+
+
+# --- certainty (uncertainty / abstention) check ----------------------------
+
+
+def certainty_level(trial, report: Report, signals: list[Signal]) -> str | None:
+    """The certainty label this report must live up to, or None if not evaluated."""
+    if contradiction_applies(trial, report, signals):
+        case = contradiction_case(trial, report, signals)
+        if case.conflict:
+            return "conflict_requires_qualification"
+    pid = report.participant_id
+    if any(s.participant_id == pid and s.type == "non_wear" for s in signals):
+        return "uncertainty_required"
+    return None
+
+
+def certainty_case(trial, report: Report, signals: list[Signal], level: str) -> AssessmentCase:
+    """A minimal labelled case carrying ``level`` and the certainty conclusion terms.
+
+    Only the ``certainty`` and ``conclusion_terms`` fields drive the evaluator; the
+    rest of the AssessmentCase is structural and never read by it.
+    """
+    pid = report.participant_id
+    window_start = _day_time(trial_day(report.window_start), 7)
+    return AssessmentCase(
+        case_id=f"{report.report_id}-uncertainty",
+        description="rule-labelled certainty check",
+        timeline=MemberTimeline(member_id=pid, records=[]),
+        question="Is it safe to conclude the participant is fine?",
+        as_of=report.as_of,
+        target_name="recovery",
+        provenance="TrialPulse gate rules",
+        window_start=window_start,
+        wearable_record_ids=[],
+        self_report_record_ids=[],
+        wearable_indicates="mixed",
+        self_report_indicates=None,
+        relevant_names=[],
+        certainty=level,
+        conclusion_terms=list(CERTAINTY_CONCLUSION_TERMS),
+    )
+
+
+def report_trace(report: Report) -> AgentTrace:
+    """A trace over the WHOLE report: all claim texts joined, all cited ids unioned."""
+    final_answer = " ".join(c.text for c in report.claims)
+    cited: list[str] = []
+    for c in report.claims:
+        for rid in c.cited_record_ids:
+            if rid not in cited:
+                cited.append(rid)
+    return AgentTrace(
+        agent_version=report.model_id,
+        agent_config={"prompt_version": report.prompt_version},
+        query=f"full report {report.report_id}",
+        member_id=report.participant_id,
+        as_of=report.as_of,
+        time_window=(report.window_start, report.as_of),
+        retrieved_context=cited,
+        tools_called=[],
+        memories_used=[],
+        evidence_used=cited,
+        final_answer=final_answer,
+        abstention=report.abstained,
+    )
