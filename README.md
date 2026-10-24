@@ -8,7 +8,8 @@ medical monitor. Every claim is checked by PulseEval before a human signs, and w
 evidence behind a claim is missing, the system asks the right participant the right
 question and redrafts from the reply.
 
-Live demo: <LIVE_URL>
+Live demo: https://trialpulse-n8gd.onrender.com
+(free hosting: the first visit after a quiet period can take up to a minute to wake the server)
 
 Hackachusetts 2026 · Biotech & healthcare (challenges H1 and H5)
 
