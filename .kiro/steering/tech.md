@@ -14,3 +14,5 @@ pulseeval.scenarios (NumericCase, AssessmentCase, RelationshipCase) and
 pulseeval.evaluation.* evaluators. Do not modify or copy PulseEval code.
 Python environment: .venv in the repo root. Run tests with: .venv\Scripts\python -m pytest -q
 Deploy: one container, FastAPI serves web/dist, Render.
+
+TypeScript is strict with noUnusedLocals and noUnusedParameters: never leave unused imports, variables or props; the reviewer's build fails on them.

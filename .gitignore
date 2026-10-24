@@ -12,3 +12,4 @@ data/derived/*
 *.sqlite3
 .env
 .kiro/runs/
+*.tsbuildinfo
