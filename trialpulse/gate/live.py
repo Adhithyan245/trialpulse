@@ -29,6 +29,8 @@ from trialpulse.gate.adapter import (
     report_trace,
     trace_for,
 )
+from trialpulse.gate.negative_control import check as negative_control_check
+from trialpulse.gate.negative_control import compare as _negative_control_compare
 from trialpulse.gate.recompute import recompute_check
 
 # Report-level dimension prefixes: their suffix is a report id, not a claim id.
@@ -88,6 +90,11 @@ def gate_report(trial, report: Report, signals: list[Signal]) -> GateResult:
         rc = recompute_check(claim, _cited_readings(trial, claim))
         if rc is not None:
             checks.append(rc)
+
+        # Negative control, per claim, only when the claim links a change to the drug.
+        nc = negative_control_check(trial, report, claim, signals)
+        if nc is not None:
+            checks.append(nc)
 
     # Contradiction, per report.
     if contradiction_applies(trial, report, signals):
@@ -152,3 +159,9 @@ def failed_dimensions(result: GateResult) -> list[str]:
         if prefix not in out:
             out.append(prefix)
     return out
+
+
+
+def negative_control_summary(trial, report: Report, signals: list[Signal]) -> dict:
+    """The negative-control comparison for this report's participant, for the UI."""
+    return _negative_control_compare(trial, report.participant_id, report.as_of, signals)
