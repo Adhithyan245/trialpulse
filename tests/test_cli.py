@@ -53,9 +53,9 @@ def test_generate_command_writes_file():
 
 def test_report_with_llm_error_exits_2(monkeypatch, capsys):
     """report with GeminiModel raising LLMError exits with code 2."""
-    from trialpulse.agent import llm
+    import trialpulse.__main__
 
-    monkeypatch.setattr(llm, "GeminiModel", lambda: FakeErrorModel())
+    monkeypatch.setattr(trialpulse.__main__, "GeminiModel", lambda: FakeErrorModel())
 
     exit_code = main(["report", "P-07", "--day", "15"])
     assert exit_code == 2
