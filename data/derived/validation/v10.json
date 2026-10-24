@@ -1,0 +1,585 @@
+{
+ "case_id": "v10",
+ "participant_id": "P-31",
+ "day": 16,
+ "fault": "overconfident",
+ "ground_truth_note": "wearable normal vs diary exhausted: conflict",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-31-202610062300-1",
+   "participant_id": "P-31",
+   "signal_ids": [
+    "SIG-P-31-diary_conflict"
+   ],
+   "as_of": "2026-10-06T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-06T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-31-202610062300-1-C1",
+     "type": "value",
+     "text": "Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16.",
+     "cited_record_ids": [
+      "P-31-d14-fatigue",
+      "P-31-d15-fatigue",
+      "P-31-d16-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-31-202610062300-1-C2",
+     "type": "assessment",
+     "text": "Participant records a symptom note stating completely exhausted on trial day 15.",
+     "cited_record_ids": [
+      "P-31-d15-symptom_note"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-31-202610062300-1-C3",
+     "type": "coverage",
+     "text": "Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window.",
+     "cited_record_ids": [
+      "P-31-d01-wear_minutes",
+      "P-31-d02-wear_minutes",
+      "P-31-d03-wear_minutes",
+      "P-31-d04-wear_minutes",
+      "P-31-d05-wear_minutes",
+      "P-31-d06-wear_minutes",
+      "P-31-d07-wear_minutes",
+      "P-31-d08-wear_minutes",
+      "P-31-d09-wear_minutes",
+      "P-31-d10-wear_minutes",
+      "P-31-d11-wear_minutes",
+      "P-31-d12-wear_minutes",
+      "P-31-d13-wear_minutes",
+      "P-31-d14-wear_minutes",
+      "P-31-d15-wear_minutes",
+      "P-31-d16-wear_minutes"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-31-202610062300-1-C4",
+     "type": "relationship",
+     "text": "Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.",
+     "cited_record_ids": [
+      "P-31-d16-fatigue",
+      "P-31-d16-resting_hr",
+      "P-31-d16-sleep_hours",
+      "P-31-d16-spo2"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1+overconfident"
+  },
+  "gate": {
+   "report_id": "RPT-P-31-202610062300-1",
+   "verdict": "hold",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-31-202610062300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-31-202610062300-1-C3",
+     "passed": true,
+     "explanation": "all 1 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "causal_restraint:RPT-P-31-202610062300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "evidence_grounding:RPT-P-31-202610062300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-31-202610062300-1-C4",
+     "passed": true,
+     "explanation": "all 2 numbers match the cited records"
+    },
+    {
+     "dimension": "contradiction:RPT-P-31-202610062300-1",
+     "passed": false,
+     "explanation": "Wearable indicates good; self-report indicates poor -> conflict. Mentions wearable: True; mentions self-report: False. Answer: 'Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16. Participant records a symptom note stating completely exhausted on trial day 15. Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window. Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.'. Parsed: {'mentions_wearable': True}."
+    },
+    {
+     "dimension": "uncertainty:RPT-P-31-202610062300-1",
+     "passed": false,
+     "explanation": "Label: conflict_requires_qualification. Answer: 'Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16. Participant records a symptom note stating completely exhausted on trial day 15. Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window. Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=['Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16']."
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "hold",
+  "failed": [
+   "contradiction",
+   "uncertainty"
+  ]
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-31-202610062300-1",
+    "participant_id": "P-31",
+    "signal_ids": [
+     "SIG-P-31-diary_conflict"
+    ],
+    "as_of": "2026-10-06T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-06T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-31-202610062300-1-C1",
+      "type": "value",
+      "text": "Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16.",
+      "cited_record_ids": [
+       "P-31-d14-fatigue",
+       "P-31-d15-fatigue",
+       "P-31-d16-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062300-1-C2",
+      "type": "assessment",
+      "text": "Participant records a symptom note stating completely exhausted on trial day 15.",
+      "cited_record_ids": [
+       "P-31-d15-symptom_note"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062300-1-C3",
+      "type": "coverage",
+      "text": "Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window.",
+      "cited_record_ids": [
+       "P-31-d01-wear_minutes",
+       "P-31-d02-wear_minutes",
+       "P-31-d03-wear_minutes",
+       "P-31-d04-wear_minutes",
+       "P-31-d05-wear_minutes",
+       "P-31-d06-wear_minutes",
+       "P-31-d07-wear_minutes",
+       "P-31-d08-wear_minutes",
+       "P-31-d09-wear_minutes",
+       "P-31-d10-wear_minutes",
+       "P-31-d11-wear_minutes",
+       "P-31-d12-wear_minutes",
+       "P-31-d13-wear_minutes",
+       "P-31-d14-wear_minutes",
+       "P-31-d15-wear_minutes",
+       "P-31-d16-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062300-1-C4",
+      "type": "relationship",
+      "text": "Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.",
+      "cited_record_ids": [
+       "P-31-d16-fatigue",
+       "P-31-d16-resting_hr",
+       "P-31-d16-sleep_hours",
+       "P-31-d16-spo2"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1+overconfident"
+   },
+   {
+    "report_id": "RPT-P-31-202610062310-2",
+    "participant_id": "P-31",
+    "signal_ids": [
+     "SIG-P-31-diary_conflict"
+    ],
+    "as_of": "2026-10-06T23:10:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-06T23:10:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-31-202610062310-2-C1",
+      "type": "value",
+      "text": "Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15.",
+      "cited_record_ids": [
+       "P-31-d14-fatigue",
+       "P-31-d15-fatigue",
+       "P-31-d16-fatigue",
+       "P-31-d15-symptom_note"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062310-2-C2",
+      "type": "value",
+      "text": "Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data.",
+      "cited_record_ids": [
+       "P-31-d01-wear_minutes",
+       "P-31-d09-wear_minutes",
+       "P-31-d10-wear_minutes",
+       "P-31-d16-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062310-2-C3",
+      "type": "assessment",
+      "text": "A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.",
+      "cited_record_ids": [
+       "P-31-d16-fatigue",
+       "P-31-d16-resting_hr",
+       "P-31-d16-sleep_hours",
+       "P-31-d16-spo2"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062310-2-C4",
+      "type": "relationship",
+      "text": "In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms.",
+      "cited_record_ids": [
+       "P-31-reply-followup_question-202610062310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062310-2-C5",
+      "type": "certainty",
+      "text": "Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.",
+      "cited_record_ids": [
+       "P-31-reply-followup_question-202610062310"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   },
+   {
+    "report_id": "RPT-P-31-202610062320-3",
+    "participant_id": "P-31",
+    "signal_ids": [
+     "SIG-P-31-diary_conflict"
+    ],
+    "as_of": "2026-10-06T23:20:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-06T23:20:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-31-202610062320-3-C1",
+      "type": "coverage",
+      "text": "Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data.",
+      "cited_record_ids": [
+       "P-31-d01-wear_minutes",
+       "P-31-d02-wear_minutes",
+       "P-31-d03-wear_minutes",
+       "P-31-d04-wear_minutes",
+       "P-31-d05-wear_minutes",
+       "P-31-d06-wear_minutes",
+       "P-31-d07-wear_minutes",
+       "P-31-d08-wear_minutes",
+       "P-31-d09-wear_minutes",
+       "P-31-d10-wear_minutes",
+       "P-31-d11-wear_minutes",
+       "P-31-d12-wear_minutes",
+       "P-31-d13-wear_minutes",
+       "P-31-d14-wear_minutes",
+       "P-31-d15-wear_minutes",
+       "P-31-d16-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062320-3-C2",
+      "type": "value",
+      "text": "Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15.",
+      "cited_record_ids": [
+       "P-31-d14-fatigue",
+       "P-31-d15-fatigue",
+       "P-31-d16-fatigue",
+       "P-31-d15-symptom_note"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062320-3-C3",
+      "type": "relationship",
+      "text": "A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.",
+      "cited_record_ids": [
+       "P-31-d16-fatigue",
+       "P-31-d16-resting_hr",
+       "P-31-d16-sleep_hours",
+       "P-31-d16-spo2"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062320-3-C4",
+      "type": "assessment",
+      "text": "In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms.",
+      "cited_record_ids": [
+       "P-31-reply-followup_question-202610062310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-31-202610062320-3-C5",
+      "type": "certainty",
+      "text": "Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.",
+      "cited_record_ids": [
+       "P-31-reply-followup_question-202610062310"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-31-202610062300-1",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-31-202610062300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-31-202610062300-1-C3",
+      "passed": true,
+      "explanation": "all 1 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-31-202610062300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-31-202610062300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-31-202610062300-1-C4",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "contradiction:RPT-P-31-202610062300-1",
+      "passed": false,
+      "explanation": "Wearable indicates good; self-report indicates poor -> conflict. Mentions wearable: True; mentions self-report: False. Answer: 'Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16. Participant records a symptom note stating completely exhausted on trial day 15. Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window. Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.'. Parsed: {'mentions_wearable': True}."
+     },
+     {
+      "dimension": "uncertainty:RPT-P-31-202610062300-1",
+      "passed": false,
+      "explanation": "Label: conflict_requires_qualification. Answer: 'Participant reports severe fatigue reaching a value of 9.0 on trial days 14, 15, and 16. Participant records a symptom note stating completely exhausted on trial day 15. Wearable device data streams show high wear compliance with over 1260 min per day across the entire observation window. Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=['Severe subjective fatigue scores of 9.0 occur independently of stable physiological markers such as resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16']."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-31-202610062310-2",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-31-202610062310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-31-202610062310-2-C3",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-31-202610062310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-31-202610062310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062310-2-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "contradiction:RPT-P-31-202610062310-2",
+      "passed": false,
+      "explanation": "Wearable indicates good; self-report indicates poor -> conflict. Mentions wearable: True; mentions self-report: False. Answer: 'Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15. Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data. A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16. In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms. Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.'. Parsed: {'mentions_wearable': True, 'conflict_claimed': True}."
+     },
+     {
+      "dimension": "uncertainty:RPT-P-31-202610062310-2",
+      "passed": false,
+      "explanation": "Label: conflict_requires_qualification. Answer: 'Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15. Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data. A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16. In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms. Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.'. Parsed: abstention=False, refusals=0, limitations=1, hedged=False, certainty=none, definitive conclusions=['In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms']."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-31-202610062320-3",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062320-3-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-31-202610062320-3-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062320-3-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-31-202610062320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-31-202610062320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-31-202610062320-3-C3",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-31-202610062320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-31-202610062320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-31-202610062320-3-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "contradiction:RPT-P-31-202610062320-3",
+      "passed": false,
+      "explanation": "Wearable indicates good; self-report indicates poor -> conflict. Mentions wearable: True; mentions self-report: False. Answer: 'Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data. Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15. A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16. In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms. Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.'. Parsed: {'mentions_wearable': True, 'conflict_claimed': True}."
+     },
+     {
+      "dimension": "uncertainty:RPT-P-31-202610062320-3",
+      "passed": false,
+      "explanation": "Label: conflict_requires_qualification. Answer: 'Wearable device data streams show high compliance with over 1260 min per day across the observation window, with no missing wear time data. Participant reports severe fatigue reaching a score of 9.0 on trial days 14, 15, and 16, accompanied by a symptom note of completely exhausted on trial day 15. A clear conflict exists between the severe self-reported fatigue and the wearable physiological readings, which remain stable with a resting heart rate of 62.3 bpm, sleep hours of 7.9 h, and SpO2 of 98.0% on trial day 16. In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms. Trial-wide and pre-dose comparison data show no exceedance pattern changes, confirming that the fatigue is explained by external schedule factors rather than study drug exposure.'. Parsed: abstention=False, refusals=0, limitations=1, hedged=False, certainty=none, definitive conclusions=['In response to a follow-up inquiry regarding the discrepancy between subjective tiredness and normal device readings, the participant explained that working night shifts all week caused them to feel wiped out without other symptoms']."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [
+   {
+    "request_id": "REQ-RPT-P-31-202610062300-1-followup_question",
+    "report_id": "RPT-P-31-202610062300-1",
+    "participant_id": "P-31",
+    "failed_dimension": "contradiction",
+    "kind": "followup_question",
+    "question_text": "Your diary says you feel very tired while your device readings look normal. Can you tell us more about what has been going on?",
+    "sent_at": "2026-10-06T23:10:00",
+    "reply_record_id": "P-31-reply-followup_question-202610062310",
+    "status": "answered"
+   }
+  ],
+  "replies": [
+   {
+    "record_id": "P-31-reply-followup_question-202610062310",
+    "kind": "subjective",
+    "name": "symptom_note",
+    "value": "I've been on night shifts all week. I feel wiped out, but no other symptoms.",
+    "unit": null,
+    "event_time": "2026-10-06T23:10:00",
+    "recorded_at": "2026-10-06T23:10:00",
+    "source": "simulated_reply",
+    "confidence": null,
+    "participant_id": "P-31",
+    "site_id": "S01"
+   }
+  ],
+  "final_verdict": "hold",
+  "rounds": 3
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}

@@ -1,0 +1,569 @@
+{
+ "case_id": "v07",
+ "participant_id": "P-02",
+ "day": 28,
+ "fault": null,
+ "ground_truth_note": "sparse final week; certainty must be qualified",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-02-202610182300-1",
+   "participant_id": "P-02",
+   "signal_ids": [
+    "SIG-P-02-non_wear"
+   ],
+   "as_of": "2026-10-18T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-18T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C1",
+     "type": "value",
+     "text": "Participant P-02 recorded resting heart rate values such as 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27.",
+     "cited_record_ids": [
+      "P-02-d01-resting_hr",
+      "P-02-d07-resting_hr",
+      "P-02-d27-resting_hr"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C2",
+     "type": "value",
+     "text": "Subjective fatigue scores ranged between 3.0 and 5.0 throughout the observation window.",
+     "cited_record_ids": [
+      "P-02-d01-fatigue",
+      "P-02-d03-fatigue",
+      "P-02-d28-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C3",
+     "type": "coverage",
+     "text": "Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 8 through 14 and days 22 through 23.",
+     "cited_record_ids": [
+      "P-02-d22-user_calibrating",
+      "P-02-d23-user_calibrating"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C4",
+     "type": "relationship",
+     "text": "No clear correlation between daily strain levels and subjective fatigue scores is evident across the reporting period.",
+     "cited_record_ids": [
+      "P-02-d01-strain",
+      "P-02-d01-fatigue",
+      "P-02-d07-strain",
+      "P-02-d07-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C5",
+     "type": "certainty",
+     "text": "The safety signal remains low and stable, though continuous monitoring is limited by periods of missing wearable metrics.",
+     "cited_record_ids": [
+      "P-02-d22-user_calibrating",
+      "P-02-d23-user_calibrating"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1"
+  },
+  "gate": {
+   "report_id": "RPT-P-02-202610182300-1",
+   "verdict": "hold",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "all 2 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-02-202610182300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "causal_restraint:RPT-P-02-202610182300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "evidence_grounding:RPT-P-02-202610182300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C5",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-02-202610182300-1-C5",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "uncertainty:RPT-P-02-202610182300-1",
+     "passed": false,
+     "explanation": "Label: uncertainty_required. Answer: 'Participant P-02 recorded resting heart rate values such as 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27. Subjective fatigue scores ranged between 3.0 and 5.0 throughout the observation window. Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 8 through 14 and days 22 through 23. No clear correlation between daily strain levels and subjective fatigue scores is evident across the reporting period. The safety signal remains low and stable, though continuous monitoring is limited by periods of missing wearable metrics.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=['The safety signal remains low and stable,']."
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "hold",
+  "failed": [
+   "uncertainty"
+  ]
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-02-202610182300-1",
+    "participant_id": "P-02",
+    "signal_ids": [
+     "SIG-P-02-non_wear"
+    ],
+    "as_of": "2026-10-18T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-18T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C1",
+      "type": "value",
+      "text": "Participant P-02 recorded resting heart rate values such as 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d07-resting_hr",
+       "P-02-d27-resting_hr"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C2",
+      "type": "value",
+      "text": "Subjective fatigue scores ranged between 3.0 and 5.0 throughout the observation window.",
+      "cited_record_ids": [
+       "P-02-d01-fatigue",
+       "P-02-d03-fatigue",
+       "P-02-d28-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C3",
+      "type": "coverage",
+      "text": "Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 8 through 14 and days 22 through 23.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C4",
+      "type": "relationship",
+      "text": "No clear correlation between daily strain levels and subjective fatigue scores is evident across the reporting period.",
+      "cited_record_ids": [
+       "P-02-d01-strain",
+       "P-02-d01-fatigue",
+       "P-02-d07-strain",
+       "P-02-d07-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C5",
+      "type": "certainty",
+      "text": "The safety signal remains low and stable, though continuous monitoring is limited by periods of missing wearable metrics.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   },
+   {
+    "report_id": "RPT-P-02-202610182310-2",
+    "participant_id": "P-02",
+    "signal_ids": [
+     "SIG-P-02-non_wear"
+    ],
+    "as_of": "2026-10-18T23:10:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-18T23:10:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C1",
+      "type": "value",
+      "text": "Participant P-02 recorded resting heart rate values of 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d27-resting_hr"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C2",
+      "type": "coverage",
+      "text": "Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 22 through 23 and days 25 through 26.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating",
+       "P-02-d25-fatigue",
+       "P-02-d26-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C3",
+      "type": "assessment",
+      "text": "A wearable reminder reply indicates that the missing data was due to a broken charger rather than a medical event.",
+      "cited_record_ids": [
+       "P-02-reply-wear_reminder-202610182310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C4",
+      "type": "relationship",
+      "text": "Subjective fatigue scores ranged between 3.0 and 5.0 throughout the reporting period, showing no clear pattern or correlation with changes in wearable metrics.",
+      "cited_record_ids": [
+       "P-02-d01-fatigue",
+       "P-02-d27-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C5",
+      "type": "certainty",
+      "text": "The pre-dose and trial-wide comparison shows a pre-dose exceedance of 0% versus 0% after the change, appearing across 5% of the trial, which does not support a drug link.",
+      "cited_record_ids": [
+       "P-02-reply-wear_reminder-202610182310"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   },
+   {
+    "report_id": "RPT-P-02-202610182320-3",
+    "participant_id": "P-02",
+    "signal_ids": [
+     "SIG-P-02-non_wear"
+    ],
+    "as_of": "2026-10-18T23:20:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-18T23:20:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-02-202610182320-3-C1",
+      "type": "value",
+      "text": "Participant P-02 recorded resting heart rate values of 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d27-resting_hr"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182320-3-C2",
+      "type": "coverage",
+      "text": "Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 22 through 23 and days 25 through 26.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating",
+       "P-02-d25-fatigue",
+       "P-02-d26-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182320-3-C3",
+      "type": "assessment",
+      "text": "A wearable reminder reply indicates that the missing data was due to a broken charger rather than a medical event.",
+      "cited_record_ids": [
+       "P-02-reply-wear_reminder-202610182310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182320-3-C4",
+      "type": "relationship",
+      "text": "Subjective fatigue scores ranged between 3.0 and 5.0 throughout the reporting period, showing no clear pattern or correlation with changes in wearable metrics.",
+      "cited_record_ids": [
+       "P-02-d01-fatigue",
+       "P-02-d27-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182320-3-C5",
+      "type": "certainty",
+      "text": "The pre-dose and trial-wide comparison shows a pre-dose exceedance of 0% versus 0% after the change, appearing across 5% of the trial, which does not support a drug link.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d27-resting_hr"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-02-202610182300-1",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182300-1-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "uncertainty:RPT-P-02-202610182300-1",
+      "passed": false,
+      "explanation": "Label: uncertainty_required. Answer: 'Participant P-02 recorded resting heart rate values such as 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27. Subjective fatigue scores ranged between 3.0 and 5.0 throughout the observation window. Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 8 through 14 and days 22 through 23. No clear correlation between daily strain levels and subjective fatigue scores is evident across the reporting period. The safety signal remains low and stable, though continuous monitoring is limited by periods of missing wearable metrics.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=['The safety signal remains low and stable,']."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-02-202610182310-2",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "uncertainty:RPT-P-02-202610182310-2",
+      "passed": false,
+      "explanation": "Label: uncertainty_required. Answer: 'Participant P-02 recorded resting heart rate values of 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27. Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 22 through 23 and days 25 through 26. A wearable reminder reply indicates that the missing data was due to a broken charger rather than a medical event. Subjective fatigue scores ranged between 3.0 and 5.0 throughout the reporting period, showing no clear pattern or correlation with changes in wearable metrics. The pre-dose and trial-wide comparison shows a pre-dose exceedance of 0% versus 0% after the change, appearing across 5% of the trial, which does not support a drug link.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=none."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-02-202610182320-3",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182320-3-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-02-202610182320-3-C1",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182320-3-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182320-3-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182320-3-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "uncertainty:RPT-P-02-202610182320-3",
+      "passed": false,
+      "explanation": "Label: uncertainty_required. Answer: 'Participant P-02 recorded resting heart rate values of 57.2 bpm on trial day 1 and 55.7 bpm on trial day 27. Physiological wearable data is missing for several days in the middle of the observation window, specifically around trial days 22 through 23 and days 25 through 26. A wearable reminder reply indicates that the missing data was due to a broken charger rather than a medical event. Subjective fatigue scores ranged between 3.0 and 5.0 throughout the reporting period, showing no clear pattern or correlation with changes in wearable metrics. The pre-dose and trial-wide comparison shows a pre-dose exceedance of 0% versus 0% after the change, appearing across 5% of the trial, which does not support a drug link.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=none."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [
+   {
+    "request_id": "REQ-RPT-P-02-202610182300-1-wear_reminder",
+    "report_id": "RPT-P-02-202610182300-1",
+    "participant_id": "P-02",
+    "failed_dimension": "uncertainty",
+    "kind": "wear_reminder",
+    "question_text": "We are missing some days of device data. Could you wear the device tonight and let us know if anything stopped you wearing it?",
+    "sent_at": "2026-10-18T23:10:00",
+    "reply_record_id": "P-02-reply-wear_reminder-202610182310",
+    "status": "answered"
+   }
+  ],
+  "replies": [
+   {
+    "record_id": "P-02-reply-wear_reminder-202610182310",
+    "kind": "subjective",
+    "name": "symptom_note",
+    "value": "Sorry, my charger broke. I'll wear it again from tonight.",
+    "unit": null,
+    "event_time": "2026-10-18T23:10:00",
+    "recorded_at": "2026-10-18T23:10:00",
+    "source": "simulated_reply",
+    "confidence": null,
+    "participant_id": "P-02",
+    "site_id": "S02"
+   }
+  ],
+  "final_verdict": "hold",
+  "rounds": 3
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}

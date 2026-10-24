@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #0e1a24;
+  --surface: #f4f6f7;
+  --card: #ffffff;
+  --line: #d8dfe3;
+  --text: #13212b;
+  --muted: #5a6a75;
+  --accent: #0f7c86;
+  --accent-soft: #ddeff0;
+  --pass: #1e7a4c;
+  --pass-soft: #e1f2e8;
+  --watch: #a86400;
+  --watch-soft: #fbefdc;
+  --held: #b3261e;
+  --held-soft: #fbe4e2;
+}
+
+/* Dark theme via system preference (media fallback). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #08121a;
+    --surface: #0f1920;
+    --card: #15222b;
+    --line: #263640;
+    --text: #e2ebef;
+    --muted: #9aadb7;
+    --accent: #4fc2cc;
+    --accent-soft: #143a3f;
+    --pass: #74d29c;
+    --pass-soft: #15301f;
+    --watch: #f0b460;
+    --watch-soft: #3a2b14;
+    --held: #ff8a80;
+    --held-soft: #3b1c1a;
+  }
+}
+
+/* Light theme forced regardless of system preference. */
+:root[data-theme="light"] {
+  --ink: #0e1a24;
+  --surface: #f4f6f7;
+  --card: #ffffff;
+  --line: #d8dfe3;
+  --text: #13212b;
+  --muted: #5a6a75;
+  --accent: #0f7c86;
+  --accent-soft: #ddeff0;
+  --pass: #1e7a4c;
+  --pass-soft: #e1f2e8;
+  --watch: #a86400;
+  --watch-soft: #fbefdc;
+  --held: #b3261e;
+  --held-soft: #fbe4e2;
+}
+
+/* Dark theme forced via the data-theme attribute. */
+:root[data-theme="dark"] {
+  --ink: #08121a;
+  --surface: #0f1920;
+  --card: #15222b;
+  --line: #263640;
+  --text: #e2ebef;
+  --muted: #9aadb7;
+  --accent: #4fc2cc;
+  --accent-soft: #143a3f;
+  --pass: #74d29c;
+  --pass-soft: #15301f;
+  --watch: #f0b460;
+  --watch-soft: #3a2b14;
+  --held: #ff8a80;
+  --held-soft: #3b1c1a;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  margin: 0;
+}
+
+/* Numbers, record IDs and timestamps line up in columns. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Visible keyboard focus everywhere. */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Respect the user's motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

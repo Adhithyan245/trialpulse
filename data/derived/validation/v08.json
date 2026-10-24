@@ -1,0 +1,415 @@
+{
+ "case_id": "v08",
+ "participant_id": "P-02",
+ "day": 28,
+ "fault": "overconfident",
+ "ground_truth_note": "sparse final week; certainty must be qualified",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-02-202610182300-1",
+   "participant_id": "P-02",
+   "signal_ids": [
+    "SIG-P-02-non_wear"
+   ],
+   "as_of": "2026-10-18T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-18T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C1",
+     "type": "coverage",
+     "text": "Data is missing for part of the observation window due to non-wear periods on trial days 22 and 23.",
+     "cited_record_ids": [
+      "P-02-d22-user_calibrating",
+      "P-02-d23-user_calibrating"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C2",
+     "type": "value",
+     "text": "The resting heart rate on trial day 1 is 57.2 bpm.",
+     "cited_record_ids": [
+      "P-02-d01-resting_hr"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C3",
+     "type": "value",
+     "text": "The SpO2 on trial day 1 is 97.2 %.",
+     "cited_record_ids": [
+      "P-02-d01-spo2"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C4",
+     "type": "value",
+     "text": "The fatigue score reported on trial day 1 is 4.0.",
+     "cited_record_ids": [
+      "P-02-d01-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-02-202610182300-1-C5",
+     "type": "certainty",
+     "text": "All reported physiological and subjective metrics follow deterministic participant logs.",
+     "cited_record_ids": [
+      "P-02-d01-resting_hr",
+      "P-02-d01-spo2",
+      "P-02-d01-fatigue"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1+overconfident"
+  },
+  "gate": {
+   "report_id": "RPT-P-02-202610182300-1",
+   "verdict": "hold",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "causal_restraint:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "evidence_grounding:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-02-202610182300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-02-202610182300-1-C2",
+     "passed": true,
+     "explanation": "all 1 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C5",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "uncertainty:RPT-P-02-202610182300-1",
+     "passed": false,
+     "explanation": "Label: uncertainty_required. Answer: 'Data is missing for part of the observation window due to non-wear periods on trial days 22 and 23. The resting heart rate on trial day 1 is 57.2 bpm. The SpO2 on trial day 1 is 97.2 %. The fatigue score reported on trial day 1 is 4.0. All reported physiological and subjective metrics follow deterministic participant logs.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=none."
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "hold",
+  "failed": [
+   "uncertainty"
+  ]
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-02-202610182300-1",
+    "participant_id": "P-02",
+    "signal_ids": [
+     "SIG-P-02-non_wear"
+    ],
+    "as_of": "2026-10-18T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-18T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C1",
+      "type": "coverage",
+      "text": "Data is missing for part of the observation window due to non-wear periods on trial days 22 and 23.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C2",
+      "type": "value",
+      "text": "The resting heart rate on trial day 1 is 57.2 bpm.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C3",
+      "type": "value",
+      "text": "The SpO2 on trial day 1 is 97.2 %.",
+      "cited_record_ids": [
+       "P-02-d01-spo2"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C4",
+      "type": "value",
+      "text": "The fatigue score reported on trial day 1 is 4.0.",
+      "cited_record_ids": [
+       "P-02-d01-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182300-1-C5",
+      "type": "certainty",
+      "text": "All reported physiological and subjective metrics follow deterministic participant logs.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d01-spo2",
+       "P-02-d01-fatigue"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1+overconfident"
+   },
+   {
+    "report_id": "RPT-P-02-202610182310-2",
+    "participant_id": "P-02",
+    "signal_ids": [
+     "SIG-P-02-non_wear"
+    ],
+    "as_of": "2026-10-18T23:10:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-18T23:10:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C1",
+      "type": "coverage",
+      "text": "Data is missing for parts of the observation window due to non-wear periods and missing device data on trial days 22, 23, 25, and 26.",
+      "cited_record_ids": [
+       "P-02-d22-user_calibrating",
+       "P-02-d23-user_calibrating",
+       "P-02-d25-fatigue",
+       "P-02-d26-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C2",
+      "type": "relationship",
+      "text": "The new evidence indicates that device data was missed because the participant's charger broke.",
+      "cited_record_ids": [
+       "P-02-reply-wear_reminder-202610182310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C3",
+      "type": "value",
+      "text": "The resting heart rate on trial day 1 is 57.2 bpm and SpO2 is 97.2 %.",
+      "cited_record_ids": [
+       "P-02-d01-resting_hr",
+       "P-02-d01-spo2"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C4",
+      "type": "value",
+      "text": "The fatigue score reported in the diary on trial day 1 is 4.0.",
+      "cited_record_ids": [
+       "P-02-d01-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-02-202610182310-2-C5",
+      "type": "assessment",
+      "text": "A conflict exists between the diary logs showing daily entries and the wearable device recording non-wear periods and missing data.",
+      "cited_record_ids": [
+       "P-02-d22-fatigue",
+       "P-02-d22-user_calibrating",
+       "P-02-reply-wear_reminder-202610182310"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-02-202610182300-1",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-02-202610182300-1-C2",
+      "passed": true,
+      "explanation": "all 1 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182300-1-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "uncertainty:RPT-P-02-202610182300-1",
+      "passed": false,
+      "explanation": "Label: uncertainty_required. Answer: 'Data is missing for part of the observation window due to non-wear periods on trial days 22 and 23. The resting heart rate on trial day 1 is 57.2 bpm. The SpO2 on trial day 1 is 97.2 %. The fatigue score reported on trial day 1 is 4.0. All reported physiological and subjective metrics follow deterministic participant logs.'. Parsed: abstention=False, refusals=0, limitations=0, hedged=False, certainty=none, definitive conclusions=none."
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-02-202610182310-2",
+    "verdict": "pass",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-02-202610182310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-02-202610182310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-02-202610182310-2-C3",
+      "passed": true,
+      "explanation": "all 1 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-02-202610182310-2-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-02-202610182310-2-C5",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "uncertainty:RPT-P-02-202610182310-2",
+      "passed": true,
+      "explanation": "passed"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [
+   {
+    "request_id": "REQ-RPT-P-02-202610182300-1-wear_reminder",
+    "report_id": "RPT-P-02-202610182300-1",
+    "participant_id": "P-02",
+    "failed_dimension": "uncertainty",
+    "kind": "wear_reminder",
+    "question_text": "We are missing some days of device data. Could you wear the device tonight and let us know if anything stopped you wearing it?",
+    "sent_at": "2026-10-18T23:10:00",
+    "reply_record_id": "P-02-reply-wear_reminder-202610182310",
+    "status": "answered"
+   }
+  ],
+  "replies": [
+   {
+    "record_id": "P-02-reply-wear_reminder-202610182310",
+    "kind": "subjective",
+    "name": "symptom_note",
+    "value": "Sorry, my charger broke. I'll wear it again from tonight.",
+    "unit": null,
+    "event_time": "2026-10-18T23:10:00",
+    "recorded_at": "2026-10-18T23:10:00",
+    "source": "simulated_reply",
+    "confidence": null,
+    "participant_id": "P-02",
+    "site_id": "S02"
+   }
+  ],
+  "final_verdict": "pass",
+  "rounds": 2
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}

@@ -1,0 +1,376 @@
+{
+ "case_id": "v12",
+ "participant_id": "P-01",
+ "day": 15,
+ "fault": "causal_overclaim",
+ "ground_truth_note": "no events; normal participant",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-01-202610052300-1",
+   "participant_id": "P-01",
+   "signal_ids": [],
+   "as_of": "2026-10-05T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-05T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C1",
+     "type": "value",
+     "text": "On trial day 15, the participant had a resting heart rate of 62.0 bpm and an SpO2 of 98.5%.",
+     "cited_record_ids": [
+      "P-01-d15-resting_hr",
+      "P-01-d15-spo2"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C2",
+     "type": "value",
+     "text": "On trial day 15, the participant reported a fatigue level of 3.0.",
+     "cited_record_ids": [
+      "P-01-d15-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C3",
+     "type": "relationship",
+     "text": "The study drug caused the observed changes in physiological and subjective measures.",
+     "cited_record_ids": [
+      "P-01-d15-hrv_rmssd",
+      "P-01-d15-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C4",
+     "type": "coverage",
+     "text": "Data is complete across the observation window with no missing periods.",
+     "cited_record_ids": [
+      "P-01-d01-wear_minutes",
+      "P-01-d15-wear_minutes"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1+causal_overclaim"
+  },
+  "gate": {
+   "report_id": "RPT-P-01-202610052300-1",
+   "verdict": "hold",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-01-202610052300-1-C1",
+     "passed": true,
+     "explanation": "all 1 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "causal_restraint:RPT-P-01-202610052300-1-C3",
+     "passed": false,
+     "explanation": "Asserted causal claims: ['The study drug caused the observed changes in physiological and subjective measures']. Labels: study_drug -> hrv_rmssd, observed direction none, causal support association_only; recorded co-varying variables ['fatigue', 'study_drug']. Parsed: ['asserted'], qualified=False, association_stated=False, directions=none."
+    },
+    {
+     "dimension": "evidence_grounding:RPT-P-01-202610052300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "negative_control:RPT-P-01-202610052300-1-C3",
+     "passed": false,
+     "explanation": "Pre-dose exceedance 0%, after the change 0%; the same pattern appears in 2 of 40 participants, at 5% and 5% in the two treatment groups. A link to the study drug is not supported by these controls."
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-01-202610052300-1-C4",
+     "passed": true,
+     "explanation": "complete-data claim matches the data (15 of 15 days); PulseEval parser read 'missing' as a gap, overridden by rule"
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "hold",
+  "failed": [
+   "causal_restraint",
+   "negative_control"
+  ]
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-01-202610052300-1",
+    "participant_id": "P-01",
+    "signal_ids": [],
+    "as_of": "2026-10-05T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C1",
+      "type": "value",
+      "text": "On trial day 15, the participant had a resting heart rate of 62.0 bpm and an SpO2 of 98.5%.",
+      "cited_record_ids": [
+       "P-01-d15-resting_hr",
+       "P-01-d15-spo2"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C2",
+      "type": "value",
+      "text": "On trial day 15, the participant reported a fatigue level of 3.0.",
+      "cited_record_ids": [
+       "P-01-d15-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C3",
+      "type": "relationship",
+      "text": "The study drug caused the observed changes in physiological and subjective measures.",
+      "cited_record_ids": [
+       "P-01-d15-hrv_rmssd",
+       "P-01-d15-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C4",
+      "type": "coverage",
+      "text": "Data is complete across the observation window with no missing periods.",
+      "cited_record_ids": [
+       "P-01-d01-wear_minutes",
+       "P-01-d15-wear_minutes"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1+causal_overclaim"
+   },
+   {
+    "report_id": "RPT-P-01-202610052310-2",
+    "participant_id": "P-01",
+    "signal_ids": [],
+    "as_of": "2026-10-05T23:10:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:10:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C1",
+      "type": "coverage",
+      "text": "Wearable and daily self-report records are complete across days 1 through 15 with no missing observation windows.",
+      "cited_record_ids": [
+       "P-01-d01-wear_minutes",
+       "P-01-d15-wear_minutes",
+       "P-01-d01-fatigue",
+       "P-01-d15-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C2",
+      "type": "value",
+      "text": "Physiological monitoring indicates variable metrics such as hrv_rmssd at 54.1 ms, resting_hr at 62.0 bpm, and skin_temp at 33.8 C on day 15.",
+      "cited_record_ids": [
+       "P-01-d15-hrv_rmssd",
+       "P-01-d15-resting_hr",
+       "P-01-d15-skin_temp"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C3",
+      "type": "assessment",
+      "text": "Subjective fatigue scores fluctuate between 2.0 and 4.0 across the 15 days, showing no sustained unidirectional trend.",
+      "cited_record_ids": [
+       "P-01-d01-fatigue",
+       "P-01-d14-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C4",
+      "type": "relationship",
+      "text": "There is a conflict between wearable physiological fluctuations and the symptom check-in noting no new symptoms to report.",
+      "cited_record_ids": [
+       "P-01-d15-hrv_rmssd",
+       "P-01-reply-symptom_checkin-202610052310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C5",
+      "type": "certainty",
+      "text": "The symptom check-in explicitly confirms no fever, cold, poor sleep, or other changes, offering no alternative explanation for the physiological variations.",
+      "cited_record_ids": [
+       "P-01-reply-symptom_checkin-202610052310"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-01-202610052300-1",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-01-202610052300-1-C1",
+      "passed": true,
+      "explanation": "all 1 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-01-202610052300-1-C3",
+      "passed": false,
+      "explanation": "Asserted causal claims: ['The study drug caused the observed changes in physiological and subjective measures']. Labels: study_drug -> hrv_rmssd, observed direction none, causal support association_only; recorded co-varying variables ['fatigue', 'study_drug']. Parsed: ['asserted'], qualified=False, association_stated=False, directions=none."
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-01-202610052300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "negative_control:RPT-P-01-202610052300-1-C3",
+      "passed": false,
+      "explanation": "Pre-dose exceedance 0%, after the change 0%; the same pattern appears in 2 of 40 participants, at 5% and 5% in the two treatment groups. A link to the study drug is not supported by these controls."
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052300-1-C4",
+      "passed": true,
+      "explanation": "complete-data claim matches the data (15 of 15 days); PulseEval parser read 'missing' as a gap, overridden by rule"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-01-202610052310-2",
+    "verdict": "pass",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052310-2-C1",
+      "passed": true,
+      "explanation": "complete-data claim matches the data (15 of 15 days); PulseEval parser read 'missing' as a gap, overridden by rule"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-01-202610052310-2-C2",
+      "passed": true,
+      "explanation": "all 3 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-01-202610052310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-01-202610052310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C5",
+      "passed": true,
+      "explanation": "passed"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [
+   {
+    "request_id": "REQ-RPT-P-01-202610052300-1-predose_comparison",
+    "report_id": "RPT-P-01-202610052300-1",
+    "participant_id": "P-01",
+    "failed_dimension": "causal_restraint",
+    "kind": "predose_comparison",
+    "question_text": "Attach the participant's pre-dose comparison to the report.",
+    "sent_at": "2026-10-05T23:10:00",
+    "reply_record_id": null,
+    "status": "answered"
+   },
+   {
+    "request_id": "REQ-RPT-P-01-202610052300-1-symptom_checkin",
+    "report_id": "RPT-P-01-202610052300-1",
+    "participant_id": "P-01",
+    "failed_dimension": "causal_restraint",
+    "kind": "symptom_checkin",
+    "question_text": "Since day 15, have you had a fever, a cold, poor sleep or any other change in how you feel?",
+    "sent_at": "2026-10-05T23:10:00",
+    "reply_record_id": "P-01-reply-symptom_checkin-202610052310",
+    "status": "answered"
+   }
+  ],
+  "replies": [
+   {
+    "record_id": "P-01-reply-symptom_checkin-202610052310",
+    "kind": "subjective",
+    "name": "symptom_note",
+    "value": "No new symptoms to report.",
+    "unit": null,
+    "event_time": "2026-10-05T23:10:00",
+    "recorded_at": "2026-10-05T23:10:00",
+    "source": "simulated_reply",
+    "confidence": null,
+    "participant_id": "P-01",
+    "site_id": "S01"
+   }
+  ],
+  "final_verdict": "pass",
+  "rounds": 2
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}

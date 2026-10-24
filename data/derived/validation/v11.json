@@ -1,0 +1,390 @@
+{
+ "case_id": "v11",
+ "participant_id": "P-01",
+ "day": 15,
+ "fault": null,
+ "ground_truth_note": "no events; normal participant",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-01-202610052300-1",
+   "participant_id": "P-01",
+   "signal_ids": [],
+   "as_of": "2026-10-05T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-05T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C1",
+     "type": "coverage",
+     "text": "The participant records lack any missing data within the 15-day observation window, with comprehensive daily wear minutes.",
+     "cited_record_ids": [
+      "P-01-d01-wear_minutes",
+      "P-01-d15-wear_minutes"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C2",
+     "type": "value",
+     "text": "On trial day 15, the participant reported a fatigue score of 3.0 and demonstrated a resting heart rate of 62.0 bpm and HRV RMSSD of 54.1 ms.",
+     "cited_record_ids": [
+      "P-01-d15-fatigue",
+      "P-01-d15-resting_hr",
+      "P-01-d15-hrv_rmssd"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-01-202610052300-1-C3",
+     "type": "assessment",
+     "text": "The participant maintains stable vital signs and physiological metrics, including normal SpO2 and skin temperature across the observation period.",
+     "cited_record_ids": [
+      "P-01-d01-spo2",
+      "P-01-d01-skin_temp",
+      "P-01-d15-spo2",
+      "P-01-d15-skin_temp"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1"
+  },
+  "gate": {
+   "report_id": "RPT-P-01-202610052300-1",
+   "verdict": "hold",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-01-202610052300-1-C1",
+     "passed": false,
+     "explanation": "gap claimed but window complete (15 of 15 expected daily observations available.)"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-01-202610052300-1-C2",
+     "passed": true,
+     "explanation": "all 2 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "hold",
+  "failed": [
+   "missing_data"
+  ]
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-01-202610052300-1",
+    "participant_id": "P-01",
+    "signal_ids": [],
+    "as_of": "2026-10-05T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C1",
+      "type": "coverage",
+      "text": "The participant records lack any missing data within the 15-day observation window, with comprehensive daily wear minutes.",
+      "cited_record_ids": [
+       "P-01-d01-wear_minutes",
+       "P-01-d15-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C2",
+      "type": "value",
+      "text": "On trial day 15, the participant reported a fatigue score of 3.0 and demonstrated a resting heart rate of 62.0 bpm and HRV RMSSD of 54.1 ms.",
+      "cited_record_ids": [
+       "P-01-d15-fatigue",
+       "P-01-d15-resting_hr",
+       "P-01-d15-hrv_rmssd"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052300-1-C3",
+      "type": "assessment",
+      "text": "The participant maintains stable vital signs and physiological metrics, including normal SpO2 and skin temperature across the observation period.",
+      "cited_record_ids": [
+       "P-01-d01-spo2",
+       "P-01-d01-skin_temp",
+       "P-01-d15-spo2",
+       "P-01-d15-skin_temp"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   },
+   {
+    "report_id": "RPT-P-01-202610052310-2",
+    "participant_id": "P-01",
+    "signal_ids": [],
+    "as_of": "2026-10-05T23:10:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:10:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C1",
+      "type": "coverage",
+      "text": "The observation window contains daily wearable records and self-reported fatigue entries across days 1 through 15, but a participant reply notes that a broken charger caused missing device data.",
+      "cited_record_ids": [
+       "P-01-d01-wear_minutes",
+       "P-01-d15-wear_minutes",
+       "P-01-reply-wear_reminder-202610052310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C2",
+      "type": "assessment",
+      "text": "There is a conflict between the continuous wearable capture and the participant's report of a broken charger and missing device data.",
+      "cited_record_ids": [
+       "P-01-d15-wear_minutes",
+       "P-01-reply-wear_reminder-202610052310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C3",
+      "type": "value",
+      "text": "Self-reported fatigue scores fluctuated between 2.0 and 4.0 across the observation period.",
+      "cited_record_ids": [
+       "P-01-d01-fatigue",
+       "P-01-d02-fatigue",
+       "P-01-d14-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052310-2-C4",
+      "type": "value",
+      "text": "Resting heart rate ranged from a minimum of 56.8 bpm on day 3 to a maximum of 63.9 bpm on day 6.",
+      "cited_record_ids": [
+       "P-01-d03-resting_hr",
+       "P-01-d06-resting_hr"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   },
+   {
+    "report_id": "RPT-P-01-202610052320-3",
+    "participant_id": "P-01",
+    "signal_ids": [],
+    "as_of": "2026-10-05T23:20:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:20:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-01-202610052320-3-C1",
+      "type": "coverage",
+      "text": "The observation window is complete across all 15 expected daily observations from day 1 through day 15.",
+      "cited_record_ids": [
+       "P-01-d01-wear_minutes",
+       "P-01-d15-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052320-3-C2",
+      "type": "value",
+      "text": "Participant fatigue scores fluctuate between 2.0 and 4.0 across the reporting period.",
+      "cited_record_ids": [
+       "P-01-d01-fatigue",
+       "P-01-d02-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052320-3-C3",
+      "type": "assessment",
+      "text": "There is a conflict between the continuous wearable records showing complete daily wear and the simulated reply noting a broken charger.",
+      "cited_record_ids": [
+       "P-01-d15-wear_minutes",
+       "P-01-reply-wear_reminder-202610052310"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-01-202610052320-3-C4",
+      "type": "certainty",
+      "text": "The pre-dose exceedance rate was 0% and remained 0% after the change, aligning with a pattern seen in 5% of the trial.",
+      "cited_record_ids": [
+       "P-01-d08-resting_hr"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-01-202610052300-1",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052300-1-C1",
+      "passed": false,
+      "explanation": "gap claimed but window complete (15 of 15 expected daily observations available.)"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-01-202610052300-1-C2",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-01-202610052310-2",
+    "verdict": "hold",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-01-202610052310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-01-202610052310-2-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052310-2-C1",
+      "passed": false,
+      "explanation": "gap claimed but window complete (15 of 15 expected daily observations available.)"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052310-2-C2",
+      "passed": false,
+      "explanation": "gap claimed but window complete (15 of 15 expected daily observations available.)"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052310-2-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-01-202610052310-2-C4",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   },
+   {
+    "report_id": "RPT-P-01-202610052320-3",
+    "verdict": "pass",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052320-3-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052320-3-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052320-3-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-01-202610052320-3-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-01-202610052320-3-C4",
+      "passed": true,
+      "explanation": "passed"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [
+   {
+    "request_id": "REQ-RPT-P-01-202610052300-1-wear_reminder",
+    "report_id": "RPT-P-01-202610052300-1",
+    "participant_id": "P-01",
+    "failed_dimension": "missing_data",
+    "kind": "wear_reminder",
+    "question_text": "We are missing some days of device data. Could you wear the device tonight and let us know if anything stopped you wearing it?",
+    "sent_at": "2026-10-05T23:10:00",
+    "reply_record_id": "P-01-reply-wear_reminder-202610052310",
+    "status": "answered"
+   }
+  ],
+  "replies": [
+   {
+    "record_id": "P-01-reply-wear_reminder-202610052310",
+    "kind": "subjective",
+    "name": "symptom_note",
+    "value": "Sorry, my charger broke. I'll wear it again from tonight.",
+    "unit": null,
+    "event_time": "2026-10-05T23:10:00",
+    "recorded_at": "2026-10-05T23:10:00",
+    "source": "simulated_reply",
+    "confidence": null,
+    "participant_id": "P-01",
+    "site_id": "S01"
+   }
+  ],
+  "final_verdict": "pass",
+  "rounds": 3
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}

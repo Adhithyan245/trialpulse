@@ -1,0 +1,238 @@
+{
+ "case_id": "v01",
+ "participant_id": "P-07",
+ "day": 15,
+ "fault": null,
+ "ground_truth_note": "adverse pattern; no drug link supported; data complete",
+ "raw": {
+  "report": {
+   "report_id": "RPT-P-07-202610052300-1",
+   "participant_id": "P-07",
+   "signal_ids": [
+    "SIG-P-07-drift-hrv_rmssd",
+    "SIG-P-07-drift-respiratory_rate",
+    "SIG-P-07-drift-skin_temp"
+   ],
+   "as_of": "2026-10-05T23:00:00",
+   "window_start": "2026-09-21T07:00:00",
+   "window_end": "2026-10-05T23:00:00",
+   "claims": [
+    {
+     "claim_id": "RPT-P-07-202610052300-1-C1",
+     "type": "value",
+     "text": "The participant reported a notable increase in fatigue up to 8.0 on trial day 12 through day 15.",
+     "cited_record_ids": [
+      "P-07-d12-fatigue",
+      "P-07-d13-fatigue",
+      "P-07-d14-fatigue",
+      "P-07-d15-fatigue"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-07-202610052300-1-C2",
+     "type": "relationship",
+     "text": "Physiological changes including a drop in HRV RMSSD down to 51.6 ms and a rise in skin temperature up to 35.1 C coincided with the self-reported fatigue increases.",
+     "cited_record_ids": [
+      "P-07-d12-hrv_rmssd",
+      "P-07-d13-skin_temp"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-07-202610052300-1-C3",
+     "type": "assessment",
+     "text": "Wearable records show continuous daily compliance without missing data windows across the reported observation period.",
+     "cited_record_ids": [
+      "P-07-d01-wear_minutes",
+      "P-07-d15-wear_minutes"
+     ]
+    },
+    {
+     "claim_id": "RPT-P-07-202610052300-1-C4",
+     "type": "certainty",
+     "text": "The simultaneous elevation in respiratory rate up to 15.8 rpm and skin temperature up to 35.0 C strongly indicate a sustained physiological shift starting around trial day 12.",
+     "cited_record_ids": [
+      "P-07-d15-respiratory_rate",
+      "P-07-d15-skin_temp"
+     ]
+    }
+   ],
+   "abstained": false,
+   "model_id": "gemini-3.5-flash-lite",
+   "prompt_version": "tp-report-1"
+  },
+  "gate": {
+   "report_id": "RPT-P-07-202610052300-1",
+   "verdict": "pass",
+   "checks": [
+    {
+     "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C1",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "causal_restraint:RPT-P-07-202610052300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "evidence_grounding:RPT-P-07-202610052300-1-C2",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-07-202610052300-1-C2",
+     "passed": true,
+     "explanation": "all 2 numbers match the cited records"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "missing_data:RPT-P-07-202610052300-1-C3",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C4",
+     "passed": true,
+     "explanation": "passed"
+    },
+    {
+     "dimension": "recompute:RPT-P-07-202610052300-1-C4",
+     "passed": true,
+     "explanation": "all 2 numbers match the cited records"
+    }
+   ],
+   "pulseeval_commit": "db4e475"
+  },
+  "verdict": "pass",
+  "failed": []
+ },
+ "pipeline": {
+  "drafts": [
+   {
+    "report_id": "RPT-P-07-202610052300-1",
+    "participant_id": "P-07",
+    "signal_ids": [
+     "SIG-P-07-drift-hrv_rmssd",
+     "SIG-P-07-drift-respiratory_rate",
+     "SIG-P-07-drift-skin_temp"
+    ],
+    "as_of": "2026-10-05T23:00:00",
+    "window_start": "2026-09-21T07:00:00",
+    "window_end": "2026-10-05T23:00:00",
+    "claims": [
+     {
+      "claim_id": "RPT-P-07-202610052300-1-C1",
+      "type": "value",
+      "text": "The participant reported a notable increase in fatigue up to 8.0 on trial day 12 through day 15.",
+      "cited_record_ids": [
+       "P-07-d12-fatigue",
+       "P-07-d13-fatigue",
+       "P-07-d14-fatigue",
+       "P-07-d15-fatigue"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-07-202610052300-1-C2",
+      "type": "relationship",
+      "text": "Physiological changes including a drop in HRV RMSSD down to 51.6 ms and a rise in skin temperature up to 35.1 C coincided with the self-reported fatigue increases.",
+      "cited_record_ids": [
+       "P-07-d12-hrv_rmssd",
+       "P-07-d13-skin_temp"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-07-202610052300-1-C3",
+      "type": "assessment",
+      "text": "Wearable records show continuous daily compliance without missing data windows across the reported observation period.",
+      "cited_record_ids": [
+       "P-07-d01-wear_minutes",
+       "P-07-d15-wear_minutes"
+      ]
+     },
+     {
+      "claim_id": "RPT-P-07-202610052300-1-C4",
+      "type": "certainty",
+      "text": "The simultaneous elevation in respiratory rate up to 15.8 rpm and skin temperature up to 35.0 C strongly indicate a sustained physiological shift starting around trial day 12.",
+      "cited_record_ids": [
+       "P-07-d15-respiratory_rate",
+       "P-07-d15-skin_temp"
+      ]
+     }
+    ],
+    "abstained": false,
+    "model_id": "gemini-3.5-flash-lite",
+    "prompt_version": "tp-report-1"
+   }
+  ],
+  "gates": [
+   {
+    "report_id": "RPT-P-07-202610052300-1",
+    "verdict": "pass",
+    "checks": [
+     {
+      "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C1",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "causal_restraint:RPT-P-07-202610052300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "evidence_grounding:RPT-P-07-202610052300-1-C2",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-07-202610052300-1-C2",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "missing_data:RPT-P-07-202610052300-1-C3",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "temporal_consistency:RPT-P-07-202610052300-1-C4",
+      "passed": true,
+      "explanation": "passed"
+     },
+     {
+      "dimension": "recompute:RPT-P-07-202610052300-1-C4",
+      "passed": true,
+      "explanation": "all 2 numbers match the cited records"
+     }
+    ],
+    "pulseeval_commit": "db4e475"
+   }
+  ],
+  "requests": [],
+  "replies": [],
+  "final_verdict": "pass",
+  "rounds": 1
+ },
+ "models_used": [
+  "gemini-3.5-flash-lite"
+ ]
+}
