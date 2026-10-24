@@ -9,6 +9,8 @@ tmp folder for the recorded-run and audit-seeding paths.
 from __future__ import annotations
 
 import json
+import threading
+import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -87,6 +89,7 @@ def client(tmp_path, monkeypatch):
     audit_file = tmp_path / "audit.sqlite3"
     monkeypatch.setenv("TP_AUDIT_PATH", str(audit_file))
     monkeypatch.setenv("TP_VALIDATION_DIR", str(validation_dir))
+    monkeypatch.setenv("TP_CLOCK_CACHE", str(tmp_path / "clock.json"))
     monkeypatch.delenv("TP_LIVE_MODE", raising=False)
 
     from trialpulse.api import state as app_state
@@ -103,6 +106,8 @@ def test_health_replay_by_default(client):
     body = r.json()
     assert body["ok"] is True
     assert body["mode"] == "replay"
+    assert "ready" in body
+    assert isinstance(body["ready"], bool)
 
 
 def test_trial_blinding(client):
@@ -255,3 +260,140 @@ def test_no_arm_substring_for_monitor(client):
         r = client.get(path, headers=headers, params=params)
         assert r.status_code == 200, path
         assert '"arm"' not in r.text, path
+
+
+
+
+def test_reset_demo_clears_and_reseeds(client):
+    # Sign a report so the audit has more entries
+    client.post(
+        "/api/audit/sign",
+        headers={"X-Role": "monitor"},
+        json={
+            "report_id": "RPT-P-07-v01-1",
+            "decision": "approved",
+            "reason": "test",
+            "signer": "Dr. Test",
+        },
+    )
+    entries_before = client.get("/api/audit").json()
+    count_before = len(entries_before)
+
+    # Tamper an entry to break the chain
+    target = entries_before[0]["entry_id"]
+    client.post("/api/audit/tamper", json={"entry_id": target})
+    verify_broken = client.get("/api/audit/verify").json()
+    assert verify_broken["ok"] is False
+
+    # Reset should clear and reseed from recorded runs
+    r = client.post("/api/audit/reset-demo")
+    assert r.status_code == 200
+    verify_result = r.json()
+    assert verify_result["ok"] is True
+
+    # Audit should now contain only seeded entries from recorded runs (no signature)
+    entries_after = client.get("/api/audit").json()
+    count_after = len(entries_after)
+    assert count_after < count_before
+
+
+def test_trials_basic_query(client):
+    r = client.get("/api/trials")
+    assert r.status_code == 200
+    body = r.json()
+    assert "total" in body
+    assert "trials" in body
+    assert body["total"] > 0
+    assert len(body["trials"]) <= 50
+
+    # Check structure of first trial
+    if body["trials"]:
+        trial = body["trials"][0]
+        assert "nct_id" in trial
+        assert "title" in trial
+        assert "phase_label" in trial
+        assert "conditions" in trial
+        assert "wearable_measurable" in trial
+        assert "cities" in trial
+        assert isinstance(trial["cities"], list)
+
+
+def test_trials_wearable_filter(client):
+    r_all = client.get("/api/trials")
+    total_all = r_all.json()["total"]
+
+    r_wearable = client.get("/api/trials", params={"wearable": 1})
+    assert r_wearable.status_code == 200
+    body = r_wearable.json()
+    total_wearable = body["total"]
+
+    # Wearable-filtered should be less than or equal to all trials
+    assert total_wearable <= total_all
+
+    # All returned trials should be wearable_measurable
+    for trial in body["trials"]:
+        assert trial["wearable_measurable"] is True
+
+
+def test_trials_search_query(client):
+    # Search for a common condition
+    r = client.get("/api/trials", params={"q": "heart"})
+    assert r.status_code == 200
+    body = r.json()
+
+    # Results should contain "heart" in title or conditions
+    for trial in body["trials"]:
+        text = (trial["title"] + " " + trial["conditions"]).lower()
+        assert "heart" in text
+
+
+def test_trials_limit(client):
+    r = client.get("/api/trials", params={"limit": 5})
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["trials"]) <= 5
+
+
+def test_get_state_builds_once_under_concurrency(tmp_path, monkeypatch):
+    """Two threads entering get_state() at once must build the state exactly once.
+
+    The real builder is replaced with a counting stub that sleeps, so both threads
+    overlap inside the module lock. The lock must serialise them to a single build
+    and hand both callers the same object.
+    """
+    monkeypatch.setenv("TP_AUDIT_PATH", str(tmp_path / "audit.sqlite3"))
+    monkeypatch.setenv("TP_VALIDATION_DIR", str(tmp_path / "validation"))
+    monkeypatch.setenv("TP_CLOCK_CACHE", str(tmp_path / "clock.json"))
+
+    from trialpulse.api import state as app_state
+
+    build_count = 0
+
+    def fake_build() -> object:
+        nonlocal build_count
+        build_count += 1
+        time.sleep(0.2)  # widen the race window
+        return object()
+
+    monkeypatch.setattr(app_state, "_build_state", fake_build)
+    app_state.clear_state()
+
+    results: list[object] = []
+    barrier = threading.Barrier(2)
+
+    def worker() -> None:
+        barrier.wait()  # release both threads simultaneously
+        results.append(app_state.get_state())
+
+    threads = [threading.Thread(target=worker) for _ in range(2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert build_count == 1
+    assert len(results) == 2
+    assert results[0] is results[1]
+    assert app_state.is_ready() is True
+
+    app_state.clear_state()

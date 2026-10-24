@@ -169,8 +169,25 @@ export interface AuditEntry {
   entry_hash: string;
 }
 
+export interface PublicMetrics {
+  total_trials: number;
+  by_phase: Record<string, number>;
+  wearable_measurable_trials: number;
+  trials_with_ma_city: number;
+  top_cities: Array<[string, number]>;
+  ej_block_groups: number;
+  ej_municipalities: number;
+  trials_in_ej_municipalities: number;
+  short_sleep_by_county: Record<string, number>;
+  readmissions: {
+    hospitals: number;
+    measures: Record<string, { with_ratio: number; above_1: number }>;
+    heart_failure_above_1: number;
+  };
+}
+
 export interface Metrics {
-  public: Record<string, unknown> | null;
+  public: PublicMetrics | null;
   validation: ValidationMetrics | null;
 }
 
@@ -205,4 +222,18 @@ export interface AuditVerify {
   checked: number;
   first_bad_entry_id: string | null;
   reason: string | null;
+}
+
+export interface TrialRow {
+  nct_id: string;
+  title: string;
+  phase_label: string;
+  conditions: string;
+  wearable_measurable: boolean;
+  cities: string[];
+}
+
+export interface TrialsResponse {
+  total: number;
+  trials: TrialRow[];
 }

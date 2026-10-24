@@ -12,6 +12,8 @@ every other response is blinded.
 from __future__ import annotations
 
 import os
+import threading
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,7 +30,21 @@ from trialpulse.signals.detect import detect
 
 VALID_ROLES = ("monitor", "coordinator", "safety_reviewer")
 
-app = FastAPI(title="TrialPulse")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """Build the (slow) application state at startup in a background thread.
+
+    Starting the build off the event loop means /api/health can answer immediately
+    with ``ready: false`` while the ~30 s build runs; get_state() is single-build and
+    lock-guarded, so the first real request simply waits for this same build.
+    """
+    thread = threading.Thread(target=app_state.get_state, name="build-state", daemon=True)
+    thread.start()
+    yield
+
+
+app = FastAPI(title="TrialPulse", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,7 +71,11 @@ def _live_mode() -> bool:
 # --------------------------------------------------------------------------- #
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True, "mode": "live" if _live_mode() else "replay"}
+    return {
+        "ok": True,
+        "mode": "live" if _live_mode() else "replay",
+        "ready": app_state.is_ready(),
+    }
 
 
 @app.get("/api/trial")
@@ -201,6 +221,54 @@ def metrics() -> dict:
 
 
 # --------------------------------------------------------------------------- #
+# Trials
+# --------------------------------------------------------------------------- #
+@app.get("/api/trials")
+def trials_endpoint(q: str = "", wearable: int = 0, limit: int = 50) -> dict:
+    """Search recruiting Massachusetts trials, optionally filtering by wearable-measurable."""
+    from trialpulse.data.trials import load_locations, load_trials
+
+    trials_df = load_trials()
+    locations = load_locations()
+
+    # Filter by wearable-measurable first
+    if wearable == 1:
+        trials_df = trials_df[trials_df["wearable_measurable"] == True]
+
+    # Filter by query string (case-insensitive search in title or conditions)
+    if q:
+        q_lower = q.lower()
+        mask = trials_df.apply(
+            lambda row: q_lower in row["title"].lower()
+            or q_lower in row["conditions"].lower(),
+            axis=1,
+        )
+        trials_df = trials_df[mask]
+
+    total = len(trials_df)
+
+    # Apply limit
+    trials_df = trials_df.head(limit)
+
+    # Build response rows
+    rows = []
+    for _, row in trials_df.iterrows():
+        nct_id = row["nct_id"]
+        rows.append(
+            {
+                "nct_id": nct_id,
+                "title": row["title"],
+                "phase_label": row["phase_label"],
+                "conditions": row["conditions"],
+                "wearable_measurable": bool(row["wearable_measurable"]),
+                "cities": locations.get(nct_id, []),
+            }
+        )
+
+    return {"total": total, "trials": rows}
+
+
+# --------------------------------------------------------------------------- #
 # Live mode
 # --------------------------------------------------------------------------- #
 @app.post("/api/live/report")
@@ -299,6 +367,16 @@ def audit_tamper(body: dict) -> dict:
     tamper_for_demo(
         st.audit, entry_id, {"tampered": True, "demo": True}
     )
+    return st.audit.verify()
+
+
+@app.post("/api/audit/reset-demo")
+def audit_reset_demo() -> dict:
+    """Clear the audit table and re-seed it from recorded runs."""
+    st = app_state.get_state()
+    st.audit.reset()
+    from trialpulse.api.state import _seed_audit
+    _seed_audit(st.audit, st.runs)
     return st.audit.verify()
 
 

@@ -220,6 +220,31 @@ class AuditLog:
                 "reason": None,
             }
 
+    def reset(self) -> None:
+        """Drop and recreate the audit table, clearing all entries.
+        
+        Thread-safe: acquires the lock before dropping the table.
+        Used for the demo reset feature.
+        """
+        with self._lock:
+            self._conn.execute("DROP TABLE IF EXISTS audit")
+            self._conn.execute(
+                """
+                CREATE TABLE audit(
+                    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id TEXT UNIQUE,
+                    ts TEXT,
+                    actor_role TEXT,
+                    action TEXT,
+                    report_id TEXT,
+                    details_json TEXT,
+                    prev_hash TEXT,
+                    entry_hash TEXT
+                )
+                """
+            )
+            self._conn.commit()
+
 
 def record_loop(log: AuditLog, loop: LoopResult, ts: datetime) -> list[AuditEntry]:
     """Record a full evidence loop as audit entries, in a stable order.

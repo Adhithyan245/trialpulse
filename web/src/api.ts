@@ -106,3 +106,23 @@ export function sign(body: unknown): Promise<AuditEntry> {
 export function tamper(entryId: string): Promise<AuditVerify> {
   return postJSON<AuditVerify>("/api/audit/tamper", { entry_id: entryId });
 }
+
+export function resetDemo(): Promise<AuditVerify> {
+  return postJSON<AuditVerify>("/api/audit/reset-demo", {});
+}
+
+export function searchTrials(
+  q: string = "",
+  wearable: boolean = false,
+  limit: number = 50,
+): Promise<import("./types").TrialsResponse> {
+  const wearableParam = wearable ? 1 : 0;
+  const params = new URLSearchParams({
+    q,
+    wearable: String(wearableParam),
+    limit: String(limit),
+  });
+  return getJSON<import("./types").TrialsResponse>(
+    `/api/trials?${params.toString()}`,
+  );
+}

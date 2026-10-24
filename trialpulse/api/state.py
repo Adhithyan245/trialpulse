@@ -1,22 +1,32 @@
-"""Lazily built, cached application state for the FastAPI backend (Task T13).
+"""Built-once, cached application state for the FastAPI backend (Task T13).
 
-The state is generated once and cached (``functools.lru_cache``): the synthetic
-trial, personal bands, public/validation metrics, a precomputed per-day clock, the
-recorded validation runs, and the audit log (seeded from the recorded runs on first
-build if it is empty).
+The state is generated exactly once, guarded by a module-level lock so that
+concurrent callers (the browser fires /api/trial, /api/clock and /api/metrics at
+once on first load) all wait for a single build and then share the same object. The
+state is normally built at application startup (see the FastAPI lifespan in app.py)
+so the first request does not pay the ~30 s build cost.
+
+The state holds: the synthetic trial, personal bands, public/validation metrics, a
+precomputed per-day clock, the recorded validation runs, and the audit log (seeded
+from the recorded runs the first time its table is empty).
+
+The precomputed clock is cached to ``data/derived/clock.json`` (the trial is
+deterministic, seed 7). On startup the cache is loaded when present and its ``seed``
+and ``n_days`` match; otherwise it is computed and written.
 
 Environment variables honoured:
   TP_AUDIT_PATH       path to the audit SQLite file (default data/derived/audit.sqlite3)
   TP_VALIDATION_DIR   directory of recorded validation runs (default data/derived/validation)
+  TP_CLOCK_CACHE      path to the clock cache JSON (default data/derived/clock.json)
 
 All participant data is synthetic.
 """
 
 from __future__ import annotations
 
-import functools
 import json
 import os
+import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -34,8 +44,17 @@ from trialpulse.signals.detect import detect
 
 DEFAULT_VALIDATION_DIR = "data/derived/validation"
 DEFAULT_AUDIT_PATH = "data/derived/audit.sqlite3"
+DEFAULT_CLOCK_CACHE = "data/derived/clock.json"
 PUBLIC_METRICS_PATH = "data/derived/metrics_public.json"
 VALIDATION_METRICS_PATH = "data/derived/metrics_validation.json"
+
+# The deterministic trial seed the demo runs on.
+TRIAL_SEED = 7
+
+# Module-level single-build guard. ``_state`` is the shared instance; ``_build_lock``
+# ensures the builder runs exactly once even under concurrent first requests.
+_state: AppState | None = None
+_build_lock = threading.Lock()
 
 
 def as_of(day: int) -> datetime:
@@ -49,6 +68,10 @@ def validation_dir() -> str:
 
 def audit_path() -> str:
     return os.environ.get("TP_AUDIT_PATH", DEFAULT_AUDIT_PATH)
+
+
+def clock_cache_path() -> str:
+    return os.environ.get("TP_CLOCK_CACHE", DEFAULT_CLOCK_CACHE)
 
 
 @dataclass
@@ -139,7 +162,38 @@ def _build_clock(trial: TrialData) -> dict:
             )
         days.append({"day": d, "participants": rows})
 
-    return {"days": days}
+    return {"seed": TRIAL_SEED, "n_days": N_DAYS, "days": days}
+
+
+def _load_or_build_clock(trial: TrialData) -> dict:
+    """Return the precomputed clock, from the on-disk cache when it matches.
+
+    The cache is reused only when its ``seed`` and ``n_days`` match the current
+    deterministic trial; otherwise it is recomputed and written. Any error reading
+    the cache falls back to recomputing.
+    """
+    path = clock_cache_path()
+    cached = _load_json(path)
+    if (
+        isinstance(cached, dict)
+        and cached.get("seed") == TRIAL_SEED
+        and cached.get("n_days") == N_DAYS
+        and isinstance(cached.get("days"), list)
+    ):
+        return cached
+
+    clock = _build_clock(trial)
+    _write_clock_cache(path, clock)
+    return clock
+
+
+def _write_clock_cache(path: str, clock: dict) -> None:
+    """Write the clock cache, creating the parent directory as needed."""
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(clock, fh)
 
 
 def _seed_audit(audit: AuditLog, runs: list[dict]) -> None:
@@ -167,10 +221,9 @@ def _seed_audit(audit: AuditLog, runs: list[dict]) -> None:
         record_loop(audit, loop, ts)
 
 
-@functools.lru_cache(maxsize=1)
-def get_state() -> AppState:
-    """Build (once) and return the cached application state."""
-    trial = generate(7)
+def _build_state() -> AppState:
+    """Construct a fresh :class:`AppState`. Callers must serialise via the lock."""
+    trial = generate(TRIAL_SEED)
     bands = personal_bands(trial)
 
     public_metrics = _load_json(PUBLIC_METRICS_PATH)
@@ -178,11 +231,12 @@ def get_state() -> AppState:
         public_metrics = build_public_metrics()
     validation_metrics = _load_json(VALIDATION_METRICS_PATH)
 
-    clock = _build_clock(trial)
+    clock = _load_or_build_clock(trial)
 
     runs = _load_runs(validation_dir())
     runs_by_case = {r["case_id"]: r for r in runs}
 
+    # Seed the audit log only when its table is empty, once, inside the log's lock.
     audit = AuditLog(path=audit_path())
     if not audit.entries():
         _seed_audit(audit, runs)
@@ -199,6 +253,55 @@ def get_state() -> AppState:
     )
 
 
+def get_state() -> AppState:
+    """Return the shared application state, building it exactly once.
+
+    The build is guarded by a module-level lock: the first caller builds while any
+    concurrent callers block on the lock, then all observe the same instance. The
+    lock is held only for the duration of the build; once built, subsequent calls
+    take the fast path without locking.
+    """
+    global _state
+    if _state is not None:
+        return _state
+    with _build_lock:
+        # Re-check under the lock: another thread may have built it while we waited.
+        if _state is None:
+            _state = _build_state()
+    return _state
+
+
+def is_ready() -> bool:
+    """True once the shared state has been built."""
+    return _state is not None
+
+
 def clear_state() -> None:
     """Clear the cached state (used by tests before changing the environment)."""
-    get_state.cache_clear()
+    global _state
+    with _build_lock:
+        _state = None
+
+
+def build_cache() -> None:
+    """Compute and write the clock cache for the deterministic trial.
+
+    Exposed as ``python -m trialpulse.api.state --build-cache`` so the slow clock
+    precomputation can be done ahead of time (e.g. at container build) instead of on
+    first request.
+    """
+    trial = generate(TRIAL_SEED)
+    clock = _build_clock(trial)
+    path = clock_cache_path()
+    _write_clock_cache(path, clock)
+    print(f"wrote clock cache to {path} (seed={TRIAL_SEED}, n_days={N_DAYS})")
+
+
+if __name__ == "__main__":
+    import sys
+
+    if "--build-cache" in sys.argv[1:]:
+        build_cache()
+    else:
+        print("usage: python -m trialpulse.api.state --build-cache")
+        sys.exit(2)
