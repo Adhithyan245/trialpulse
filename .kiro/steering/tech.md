@@ -6,7 +6,7 @@ Frontend: React + Vite + TypeScript, Tailwind, Recharts, motion, lucide-react, d
 three, @react-three/fiber, @react-three/drei. No state library.
 
 LLM: Google Gemini via the google-genai SDK (from google import genai), structured JSON output.
-Model name from env GEMINI_MODEL. Key from env GEMINI_API_KEY (loaded from .env). Never hard-code either.
+Model from env GEMINI_MODEL, optional fallbacks in GEMINI_FALLBACK_MODELS (comma-separated). Key from env GEMINI_API_KEY (loaded from .env). Never hard-code either.
 If the call fails, raise. Never return a fake or simulated response.
 
 PulseEval: use pulseeval.timeline.Record and MemberTimeline, pulseeval.agent.AgentTrace,
