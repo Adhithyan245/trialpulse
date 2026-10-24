@@ -237,3 +237,15 @@ export interface TrialsResponse {
   total: number;
   trials: TrialRow[];
 }
+
+export interface TryItResponse {
+  report: Report;
+  gate: GateResult;
+  negative_control: {
+    predose_pct: number | null;
+    post_pct: number | null;
+    post_count: number;
+    total_participants: number;
+    drug_link_supported: boolean;
+  } | null;
+}

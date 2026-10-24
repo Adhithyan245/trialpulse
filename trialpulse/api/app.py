@@ -25,6 +25,7 @@ from trialpulse.api.audit import tamper_for_demo
 from trialpulse.core.models import Report
 from trialpulse.data.generator import DOSE_START_DAY, N_DAYS, SITES
 from trialpulse.gate.live import negative_control_summary
+from trialpulse.gate.tryit import run as tryit_run
 from trialpulse.signals.baseline import trial_day
 from trialpulse.signals.detect import detect
 
@@ -266,6 +267,23 @@ def trials_endpoint(q: str = "", wearable: int = 0, limit: int = 50) -> dict:
         )
 
     return {"total": total, "trials": rows}
+
+
+# --------------------------------------------------------------------------- #
+# Try to fool the checkpoint (no LLM): gate a claim a judge types.
+# --------------------------------------------------------------------------- #
+@app.post("/api/gate/try")
+def gate_try(body: dict) -> dict:
+    st = app_state.get_state()
+    try:
+        return tryit_run(
+            st.trial,
+            body["participant_id"],
+            int(body["day"]),
+            body["text"],
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 # --------------------------------------------------------------------------- #

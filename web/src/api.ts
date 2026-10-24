@@ -126,3 +126,11 @@ export function searchTrials(
     `/api/trials?${params.toString()}`,
   );
 }
+
+export function tryIt(body: {
+  participant_id: string;
+  day: number;
+  text: string;
+}): Promise<import("./types").TryItResponse> {
+  return postJSON<import("./types").TryItResponse>("/api/gate/try", body);
+}

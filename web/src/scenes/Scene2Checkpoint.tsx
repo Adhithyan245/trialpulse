@@ -11,6 +11,7 @@ import { EvidenceInbox } from "./checkpoint/EvidenceInbox";
 import { MonitorDesk } from "./checkpoint/MonitorDesk";
 import { useSequence, requestsForRound, type SequenceStep } from "./checkpoint/useSequence";
 import { checksForClaim, reportLevelChecks } from "../checks";
+import { TryIt } from "../components/TryIt";
 
 // Lazy load 3D components so the 2D path doesn't download three.js. Tunnel3D is
 // the ONLY module in this scene that imports three / @react-three/*, and it is
@@ -399,6 +400,11 @@ export function Scene2Checkpoint() {
             />
           )}
         </div>
+      </div>
+
+      {/* TryIt panel - full width at the bottom */}
+      <div className="mt-12">
+        <TryIt />
       </div>
     </div>
   );
