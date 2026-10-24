@@ -1,0 +1,107 @@
+{
+  "total_trials": 3131,
+  "by_phase": {
+    "Phase 3 (large confirmation)": 502,
+    "Not stated": 528,
+    "Not applicable (device or behavioral)": 864,
+    "Phase 1/2": 256,
+    "Phase 1 (first in people, safety)": 274,
+    "Phase 2 (does it work, dosing)": 506,
+    "Phase 4 (after approval)": 105,
+    "Early Phase 1 (exploratory)": 39,
+    "Phase 2/3": 57
+  },
+  "wearable_measurable_trials": 446,
+  "trials_with_ma_city": 3109,
+  "top_cities": [
+    [
+      "Boston",
+      2622
+    ],
+    [
+      "Worcester",
+      207
+    ],
+    [
+      "Burlington",
+      87
+    ],
+    [
+      "Springfield",
+      84
+    ],
+    [
+      "Waltham",
+      43
+    ],
+    [
+      "Foxborough",
+      40
+    ],
+    [
+      "Cambridge",
+      37
+    ],
+    [
+      "Charlestown",
+      37
+    ],
+    [
+      "Belmont",
+      36
+    ],
+    [
+      "Watertown",
+      31
+    ]
+  ],
+  "ej_block_groups": 2604,
+  "ej_municipalities": 187,
+  "trials_in_ej_municipalities": 3030,
+  "short_sleep_by_county": {
+    "Barnstable": 29.5,
+    "Berkshire": 36.4,
+    "Bristol": 34.6,
+    "Dukes": 33.0,
+    "Essex": 35.1,
+    "Franklin": 32.7,
+    "Hampden": 38.4,
+    "Hampshire": 31.5,
+    "Middlesex": 30.6,
+    "Nantucket": 31.2,
+    "Norfolk": 32.9,
+    "Plymouth": 35.2,
+    "Suffolk": 34.3,
+    "Worcester": 34.6
+  },
+  "readmissions": {
+    "hospitals": 55,
+    "measures": {
+      "READM-30-PN-HRRP": {
+        "with_ratio": 51,
+        "above_1": 36
+      },
+      "READM-30-HIP-KNEE-HRRP": {
+        "with_ratio": 43,
+        "above_1": 14
+      },
+      "READM-30-HF-HRRP": {
+        "with_ratio": 51,
+        "above_1": 35
+      },
+      "READM-30-COPD-HRRP": {
+        "with_ratio": 49,
+        "above_1": 34
+      },
+      "READM-30-CABG-HRRP": {
+        "with_ratio": 13,
+        "above_1": 8
+      },
+      "READM-30-AMI-HRRP": {
+        "with_ratio": 33,
+        "above_1": 23
+      }
+    },
+    "heart_failure_above_1": 35
+  }
+}

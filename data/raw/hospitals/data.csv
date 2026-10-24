@@ -1,0 +1,104 @@
+name,facility_type,municipality,county,icu_beds,med_surg_beds,pediatric_beds
+CHA Somerville Hospital,Non-acute Hospital,SOMERVILLE,MIDDLESEX,0,0,69
+Anna Jaques Hospital,Acute Hospital,NEWBURYPORT,ESSEX,8,63,0
+Beverly Hospital - Beverly Campus,Acute Hospital,BEVERLY,ESSEX,14,149,11
+North Shore Medical Center - Salem Hospital,Acute Hospital,SALEM,ESSEX,20,179,0
+Brown University Health - Saint Anne's Hospital,Acute Hospital,FALL RIVER,BRISTOL,12,140,28
+Metrowest Medical Center - Framingham Union Campus,Acute Hospital,FRAMINGHAM,MIDDLESEX,14,72,0
+Beverly Hospital - Addision Gilbert Campus,Acute Hospital,GLOUCESTER,ESSEX,4,48,0
+Brown University Health - Morton Hospital,Acute Hospital,TAUNTON,BRISTOL,12,81,0
+Lowell General Hospital - Saints Campus,Acute Hospital,LOWELL,MIDDLESEX,0,120,20
+MelroseWakefield Healthcare - Lawrence Memorial,Acute Hospital,MEDFORD,MIDDLESEX,0,0,0
+Metrowest Medical Center - Leonard Morse Campus,Acute Hospital,NATICK,MIDDLESEX,0,0,0
+Boston Children's Hospital,Acute Hospital,BOSTON,SUFFOLK,0,0,260
+UMass Memorial Health - Harrington Hospital,Acute Hospital,SOUTHBRIDGE,WORCESTER,3,83,0
+Cape Cod Hospital,Acute Hospital,HYANNIS,BARNSTABLE,11,229,4
+Holyoke Medical Center,Acute Hospital,HOLYOKE,HAMPDEN,12,140,7
+Mercy Medical Center Campus,Acute Hospital,SPRINGFIELD,HAMPDEN,12,156,3
+Providence Behavior Health Hospital Campus,Non-acute Hospital,HOLYOKE,HAMPDEN,0,0,0
+Massachusetts Eye and Ear Infirmary,Acute Hospital,BOSTON,SUFFOLK,0,22,19
+Cooley Dickinson Hospital,Acute Hospital,NORTHAMPTON,HAMPSHIRE,11,88,9
+Massachusetts General Hospital,Acute Hospital,Boston,SUFFOLK,101,789,46
+Neighborhealth,Satellite Emergency Facility,EAST BOSTON,SUFFOLK,0,0,0
+Adcare Hospital of Worcester,Non-acute Hospital,WORCESTER,WORCESTER,0,0,0
+Heywood Hospital,Acute Hospital,GARDNER,WORCESTER,11,73,7
+Lowell General Hospital,Acute Hospital,LOWELL,MIDDLESEX,12,181,20
+Nantucket Cottage Hospital,Acute Hospital,NANTUCKET,NANTUCKET,0,9,1
+Martha's Vineyard Hospital Inc,Acute Hospital,OAK BLUFFS,DUKES,3,17,1
+CHA Everett Hospital,Acute Hospital,EVERETT,MIDDLESEX,10,108,0
+Fairview Hospital,Acute Hospital,GREAT BARRINGTON,BERKSHIRE,5,14,2
+Beth Israel Deaconess Hospital - Needham,Acute Hospital,NEEDHAM,NORFOLK,7,66,0
+MelroseWakefield Healthcare - MelroseWakefield,Acute Hospital,MELROSE,MIDDLESEX,12,114,8
+Brigham and Women's Faulkner Hospital,Acute Hospital,BOSTON,SUFFOLK,14,185,0
+New England Baptist Hospital,Acute Hospital,BOSTON,SUFFOLK,10,108,0
+Newton-Wellesley Hospital,Acute Hospital,NEWTON,MIDDLESEX,12,153,24
+Mount Auburn Hospital,Acute Hospital,CAMBRIDGE,MIDDLESEX,20,153,0
+Beth Israel Deaconess Hospital - Plymouth,Acute Hospital,PLYMOUTH,PLYMOUTH,0,120,0
+Beth Israel Deaconess Medical Center - West,Acute Hospital,BOSTON,SUFFOLK,83,372,0
+Boston Medical Center - Brighton,Acute Hospital,BOSTON,SUFFOLK,38,156,0
+Winchester Hospital,Acute Hospital,WINCHESTER,MIDDLESEX,10,134,12
+"Fairlawn Rehabilitation Hospital, an affiliate of Encompass Health",Non-acute Hospital,WORCESTER,WORCESTER,0,0,0
+Merrimack Health Lawrence Hospital,Acute Hospital,"LAWRENCE, MA",ESSEX,19,119,15
+Sturdy Memorial Hospital,Acute Hospital,ATTLEBORO,BRISTOL,14,110,0
+Spaulding Hospital For Continuing Medical Care - Cambridge,Non-acute Hospital,CAMBRIDGE,MIDDLESEX,0,0,0
+UMass Memorial Medical Center - Marlborough Campus,Acute Hospital,MARLBOROUGH,MIDDLESEX,10,47,0
+Southcoast Health - Tobey Hospital,Acute Hospital,WAREHAM,PLYMOUTH,10,58,0
+UMass Memorial Health - Milford Regional Medical Center,Acute Hospital,MILFORD,WORCESTER,10,124,0
+CHA Cambridge Hospital,Acute Hospital,CAMBRIDGE,MIDDLESEX,8,75,45
+Signature Healthcare Brockton Hospital,Acute Hospital,BROCKTON,PLYMOUTH,0,131,8
+UMass Memorial Medical Center - Memorial Campus,Acute Hospital,WORCESTER,WORCESTER,9,192,0
+Baystate Franklin Medical Center,Acute Hospital,GREENFIELD,FRANKLIN,6,44,3
+Beth Israel Deaconess Medical Center - East,Acute Hospital,BOSTON,SUFFOLK,12,202,0
+Health Alliance-Clinton - Clinton Campus,Acute Hospital,CLINTON,WORCESTER,0,42,0
+Health Alliance-Clinton - Leominster Campus,Acute Hospital,LEOMINSTER,WORCESTER,0,87,0
+Saint Vincent Hospital,Acute Hospital,WORCESTER,WORCESTER,22,201,4
+Merrimack Health Haverhill Hospital,Acute Hospital,HAVERHILL,ESSEX,0,0,7
+Encompass Health Rehab Hospital of New England at Beverly,Non-acute Hospital,BEVERLY,ESSEX,0,0,0
+Spaulding Rehabilitation Hospital - Cape Cod,Non-acute Hospital,EAST SANDWICH,BARNSTABLE,0,0,0
+Baystate Noble Hospital,Acute Hospital,WESTFIELD,HAMPDEN,0,50,0
+UMass Memorial Health - Harrington at Webster,Satellite Emergency Facility,WEBSTER,WORCESTER,0,0,0
+Lahey Medical Center - Peabody,Acute Hospital,PEABODY,ESSEX,0,10,0
+Encompass Health Rehab Hospital of Braintree at Framingham,Hospital Inpatient Unit,FRAMINGHAM,MIDDLESEX,0,0,0
+Encompass Health Rehab Hospital of New England at Lowell,Non-acute Hospital,LOWELL,MIDDLESEX,0,0,0
+Dana Farber Cancer Institute Inpatient,Hospital Inpatient Unit,BOSTON,SUFFOLK,0,30,0
+Boston Children's Waltham,Hospital Inpatient Unit,WALTHAM,MIDDLESEX,0,0,11
+UMass Memorial Medical Center Patient Treatment and Recovery Center,Hospital Inpatient Unit,WORCESTER,WORCESTER,0,0,0
+UMass Memorial Health - Harrington at Webster,Hospital Inpatient Unit,WEBSTER,WORCESTER,0,0,0
+Lahey Hospital & Medical Center - Burlington,Acute Hospital,BURLINGTON,MIDDLESEX,53,272,0
+Emerson Hospital,Acute Hospital,CONCORD,MIDDLESEX,7,70,11
+Pappas Rehabilitation Hospital for Children,Non-acute Hospital,CANTON,NORFOLK,0,121,0
+North Adams Regional Hospital,Acute Hospital,NORTH ADAMS,BERKSHIRE,0,18,0
+Western Massachusetts Hospital,Non-acute Hospital,WESTFIELD,HAMPDEN,0,0,0
+Vibra Hospital of Western Mass - Central Campus,Non-acute Hospital,ROCHDALE,WORCESTER,0,0,0
+Vibra Hospital of Southeastern Massachusetts,Non-acute Hospital,NEW BEDFORD,BRISTOL,0,0,0
+Athol Memorial Hospital,Acute Hospital,ATHOL,WORCESTER,0,21,0
+Beth Israel Deaconess Hospital - Milton,Acute Hospital,MILTON,NORFOLK,4,94,0
+Falmouth Hospital,Acute Hospital,FALMOUTH,BARNSTABLE,10,71,0
+Hebrew Rehabilitation Center,Non-acute Hospital,BOSTON,SUFFOLK,0,0,0
+Tufts Medical Center,Acute Hospital,BOSTON,SUFFOLK,50,232,0
+Whittier Rehabiltation Hospital,Non-acute Hospital,BRADFORD,ESSEX,0,0,0
+Shriners' Hospital For Children,Acute Hospital,BOSTON,SUFFOLK,0,0,5
+Boston Medical Center - Menino Pavilion,Acute Hospital,BOSTON,SUFFOLK,65,325,22
+Berkshire Medical Center - Berkshire Campus,Acute Hospital,PITTSFIELD,BERKSHIRE,22,139,16
+Boston Medical Center - South,Acute Hospital,BROCKTON,PLYMOUTH,9,168,6
+Spaulding Rehabilitation Hospital,Non-acute Hospital,CHARLESTOWN,SUFFOLK,0,0,12
+Encompass Health Rehabilitation Hospital of New England,Non-acute Hospital,WOBURN,MIDDLESEX,0,0,0
+Encompass Health - Braintree Hospital,Non-acute Hospital,BRAINTREE,NORFOLK,0,0,0
+Dana-Farber Cancer Institute,Acute Hospital,BOSTON,SUFFOLK,0,30,0
+Brigham and Women's Hospital,Acute Hospital,BOSTON,SUFFOLK,89,668,0
+Southcoast Health - Charlton,Acute Hospital,FALL RIVER,BRISTOL,16,246,0
+Baystate Medical Center,Acute Hospital,SPRINGFIELD,HAMPDEN,32,507,45
+Lemuel Shattuck Hospital,Non-acute Hospital,BOSTON,SUFFOLK,0,119,0
+Tewksbury Hospital,Non-acute Hospital,TEWKSBURY,MIDDLESEX,0,0,0
+Franciscan Hospital for Children,Non-acute Hospital,BOSTON,SUFFOLK,0,0,40
+McLean Southeast,Non-acute Hospital,MIDDLEBOROUGH,PLYMOUTH,0,0,0
+McLean Hospital Corporation,Non-acute Hospital,BELMONT,MIDDLESEX,0,0,0
+Encompass Health Rehabilitation Hospital of Western Mass,Non-acute Hospital,LUDLOW,HAMPDEN,0,0,0
+UMass Memorial Medical Center - University Campus,Acute Hospital,WORCESTER,WORCESTER,64,347,41
+Whittier Rehabilitation Hospital - Westborough,Non-acute Hospital,WESTBOROUGH,WORCESTER,0,0,0
+South Shore Hospital,Acute Hospital,WEYMOUTH,NORFOLK,16,269,18
+Southcoast Health - St. Lukes Hospital,Acute Hospital,NEW BEDFORD,BRISTOL,16,323,25
+Westwood/Pembroke Health System - Pembroke,Non-acute Hospital,PEMBROKE,PLYMOUTH,0,0,0
+Baystate Wing Hospital and Medical Centers,Acute Hospital,PALMER,HAMPDEN,0,46,0
+Merrimack Health Methuen Hospital,Acute Hospital,METHUEN,ESSEX,9,95,20
+Pam Health Specialty Hospital of Stoughton,Non-acute Hospital,STOUGHTON,NORFOLK,0,0,0

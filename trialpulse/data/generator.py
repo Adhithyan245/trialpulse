@@ -192,7 +192,7 @@ def generate(seed: int = 7) -> TrialData:
                 else:  # 25, 26, 28
                     sparse_mode = "nothing"
 
-            # ---- adverse pattern modifiers (P-07, P-23, days 12..28) ----
+            # ---- adverse pattern modifiers (P-07, P-20, days 12..28) ----
             rhr_mod = 0.0
             hrv_mult = 1.0
             temp_mod = 0.0
